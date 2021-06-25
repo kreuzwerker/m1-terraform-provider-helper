@@ -1,7 +1,6 @@
 before:
   hooks:
     - go mod tidy
-    - go generate ./...
 builds:
   - env:
       - CGO_ENABLED=0
@@ -11,6 +10,7 @@ builds:
       - arm64
     goarm:
       - 7
+    main: ./cmd/m1-terraform-provider-helper
   
 archives:
   - replacements:
