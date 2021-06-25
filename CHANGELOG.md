@@ -1,4 +1,10 @@
 
+<a name="0.1.2"></a>
+## [0.1.2] - 2021-06-25
+### bug fixes
+- Add location of main func to goreleaser config. (ee0ac7c)
+
+
 <a name="0.1.1"></a>
 ## [0.1.1] - 2021-06-25
 ### bug fixes
