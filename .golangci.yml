@@ -1,0 +1,17 @@
+# This file contains all available configuration options
+# with their default values.
+
+# options for analysis running
+run:
+  tests: false
+
+linters:
+  enable-all: true
+  disable:
+    - lll
+    - gofumpt
+    - interfacer
+    - maligned
+    - funlen
+    - exhaustivestruct
+    - goerr113 # will be addressed later

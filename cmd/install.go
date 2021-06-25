@@ -1,0 +1,34 @@
+package cmd
+
+import (
+	"fmt"
+	"os"
+
+	"github.com/kreuzwerker/m1-terraform-provider-helper/internal/app"
+	"github.com/spf13/cobra"
+)
+
+func installCmd() *cobra.Command {
+	var versionString string
+
+	cmd := &cobra.Command{
+		Use:   "install [providerName]",
+		Args:  cobra.ExactArgs(1),
+		Short: "Downloads (and compiles) a terraform provider for the M1 chip",
+		Long:  "Download and compiles the specifiec terraform provider for your M1 chip. Provider name is the terraform registry identifier, e.g. \"hashicorp/aws\"",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			a := app.New(app.DefaultTerraformProviderDir, app.DefaultBackupDir)
+
+			if a.IsTerraformPluginDirExistent() {
+				a.Install(args[0], versionString)
+			} else {
+				fmt.Fprintln(os.Stdout, "Please activate first")
+			}
+
+			return nil
+		},
+	}
+	cmd.Flags().StringVarP(&versionString, "version", "v", "", "The version of the provider")
+
+	return cmd
+}
