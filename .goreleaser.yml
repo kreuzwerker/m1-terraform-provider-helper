@@ -27,6 +27,7 @@ brews:
     tap:
       owner: kreuzwerker
       name: homebrew-taps
+      token: "{{ .Env.GORELEASER_TOKEN }}"
 
     download_strategy: CurlDownloadStrategy
     homepage: "https://github.com/kreuzwerker/m1-terraform-provider-helper"
