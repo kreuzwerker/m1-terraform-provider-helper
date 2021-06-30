@@ -21,3 +21,13 @@ snapshot:
   name_template: "{{ .Tag }}-next"
 changelog:
   sort: asc
+
+brews:
+  -
+    tap:
+      owner: kreuzwerker
+      name: homebrew-taps
+
+    download_strategy: CurlDownloadStrategy
+    homepage: "https://github.com/kreuzwerker/m1-terraform-provider-helper"
+    description: "CLI to support with downloading and compiling terraform providers for Mac with M1 chip."
