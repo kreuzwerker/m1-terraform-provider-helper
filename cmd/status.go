@@ -1,9 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/kreuzwerker/m1-terraform-provider-helper/internal/app"
 	"github.com/spf13/cobra"
 )
@@ -16,14 +13,7 @@ func statusCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			a := app.New()
 			a.Init()
-
-			if a.IsTerraformPluginDirExistent() {
-				fmt.Fprintln(os.Stdout, "Status: Active")
-				fmt.Fprintln(os.Stdout, "Local providers are used")
-			} else {
-				fmt.Fprintln(os.Stdout, "Status: Not Active")
-				fmt.Fprintln(os.Stdout, "All providers are downloaded from the configured registries")
-			}
+			a.CheckStatus()
 
 			return nil
 		},

@@ -96,3 +96,13 @@ func (a *App) Deactivate() {
 		fmt.Fprintln(a.Out, "Deactivated")
 	}
 }
+
+func (a *App) CheckStatus() {
+	if a.IsTerraformPluginDirExistent() {
+		fmt.Fprintln(a.Out, "Status: Active")
+		fmt.Fprintln(a.Out, "Local providers are used")
+	} else {
+		fmt.Fprintln(a.Out, "Status: Not Active")
+		fmt.Fprintln(a.Out, "All providers are downloaded from the configured registries")
+	}
+}
