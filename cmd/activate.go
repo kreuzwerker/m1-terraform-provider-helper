@@ -11,7 +11,8 @@ func activateCmd() *cobra.Command {
 		Short: "Activate the usage of m1 provider helper",
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			a := app.New(app.DefaultTerraformProviderDir, app.DefaultBackupDir)
+			a := app.New()
+			a.Init()
 			a.Activate()
 
 			return nil

@@ -2,35 +2,58 @@ package app
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 )
 
-// App implements the core logic of generating passwords.
 type App struct {
-	terraformProviderDir string
-	backupDir            string
-	homeDir              string
-	cliDir               string
+	Config *Config
+	Out    io.Writer
+}
+
+type Config struct {
+	TerraformPluginDir       string
+	TerraformPluginBackupDir string
+	BaseDir                  string
+	ProvidersCacheDir        string
 }
 
 const (
-	cliDir                      = ".m1-terraform-provider-helper"
-	DefaultTerraformProviderDir = "/.terraform.d/plugins"
-	DefaultBackupDir            = "/.terraform.d/plugins_backup"
+	DefaultProvidersCacheDir        = "/.m1-terraform-provider-helper"
+	DefaultTerraformPluginDir       = "/.terraform.d/plugins"
+	DefaultTerraformPluginBackupDir = "/.terraform.d/plugins_backup"
 )
 
-func New(terraformProviderDir string, backupDir string) *App {
-	homeDir, err := os.UserHomeDir()
+func New() *App {
+	BaseDir, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return &App{
-		homeDir:              homeDir,
-		terraformProviderDir: homeDir + terraformProviderDir,
-		backupDir:            homeDir + backupDir,
-		cliDir:               homeDir + "/" + cliDir,
+	app := &App{
+		Config: &Config{
+			BaseDir:                  BaseDir,
+			TerraformPluginDir:       BaseDir + DefaultTerraformPluginDir,
+			TerraformPluginBackupDir: BaseDir + DefaultTerraformPluginBackupDir,
+			ProvidersCacheDir:        BaseDir + DefaultProvidersCacheDir,
+		},
+		Out: os.Stdout,
+	}
+
+	return app
+}
+
+func (a *App) Init() {
+	a.createDirIfNotExists(a.Config.ProvidersCacheDir)
+}
+
+func (a *App) createDirIfNotExists(dir string) {
+	if !a.isDirExistent(dir) {
+		err := os.MkdirAll(dir, 0777)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
@@ -41,30 +64,35 @@ func (a *App) isDirExistent(dir string) bool {
 }
 
 func (a *App) IsTerraformPluginDirExistent() bool {
-	return a.isDirExistent(a.terraformProviderDir)
+	return a.isDirExistent(a.Config.TerraformPluginDir)
 }
 
 func (a *App) Activate() {
-	if a.isDirExistent(a.terraformProviderDir) {
-		log.Print("test")
-		fmt.Fprintln(os.Stdout, "Already active")
+	if a.isDirExistent(a.Config.TerraformPluginDir) {
+		fmt.Fprintln(a.Out, "Already activated")
 	} else {
-		err := os.Rename(a.backupDir, a.terraformProviderDir)
+		if !a.isDirExistent(a.Config.TerraformPluginBackupDir) {
+			a.createDirIfNotExists(a.Config.TerraformPluginBackupDir)
+		}
+		err := os.Rename(a.Config.TerraformPluginBackupDir, a.Config.TerraformPluginDir)
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Fprintln(os.Stdout, "Activated")
+		fmt.Fprintln(a.Out, "Activated")
 	}
 }
 
 func (a *App) Deactivate() {
-	if a.isDirExistent(a.backupDir) {
-		fmt.Fprintln(os.Stdout, "Already Deactivated")
+	if a.isDirExistent(a.Config.TerraformPluginBackupDir) {
+		fmt.Fprintln(a.Out, "Already Deactivated")
 	} else {
-		err := os.Rename(a.terraformProviderDir, a.backupDir)
+		if !a.isDirExistent(a.Config.TerraformPluginDir) {
+			a.createDirIfNotExists(a.Config.TerraformPluginDir)
+		}
+		err := os.Rename(a.Config.TerraformPluginDir, a.Config.TerraformPluginBackupDir)
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Fprintln(os.Stdout, "Deactivated")
+		fmt.Fprintln(a.Out, "Deactivated")
 	}
 }

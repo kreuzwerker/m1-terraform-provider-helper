@@ -17,7 +17,8 @@ func installCmd() *cobra.Command {
 		Short: "Downloads (and compiles) a terraform provider for the M1 chip",
 		Long:  "Download and compiles the specifiec terraform provider for your M1 chip. Provider name is the terraform registry identifier, e.g. \"hashicorp/aws\"",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			a := app.New(app.DefaultTerraformProviderDir, app.DefaultBackupDir)
+			a := app.New()
+			a.Init()
 
 			if a.IsTerraformPluginDirExistent() {
 				a.Install(args[0], versionString)

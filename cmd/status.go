@@ -14,7 +14,9 @@ func statusCmd() *cobra.Command {
 		Short: "Shows the status of the m1 provider installations",
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			a := app.New(app.DefaultTerraformProviderDir, app.DefaultBackupDir)
+			a := app.New()
+			a.Init()
+
 			if a.IsTerraformPluginDirExistent() {
 				fmt.Fprintln(os.Stdout, "Status: Active")
 				fmt.Fprintln(os.Stdout, "Local providers are used")

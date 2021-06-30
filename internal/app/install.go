@@ -76,14 +76,14 @@ func (a *App) getProviderData(providerName string) Provider {
 }
 
 func (a *App) cloneRepo(gitURL string) {
-	if !a.isDirExistent(a.cliDir) {
-		err := os.Mkdir(a.cliDir, 0777)
+	if !a.isDirExistent(a.Config.ProvidersCacheDir) {
+		err := os.Mkdir(a.Config.ProvidersCacheDir, 0777)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	command := "cd " + a.cliDir + " && git clone " + gitURL
+	command := "cd " + a.Config.ProvidersCacheDir + " && git clone " + gitURL
 	log.Println("Executing" + command)
 	bashCmd := exec.Command("sh", "-c", command)
 
@@ -108,7 +108,7 @@ func (a *App) checkoutSourceCode(gitURL string, version string) string {
 	var r *git.Repository
 
 	repoDir := strings.Split(gitURL, "/")[1]
-	path := a.cliDir + "/" + repoDir
+	path := a.Config.ProvidersCacheDir + "/" + repoDir
 
 	if !a.isDirExistent(path) {
 		a.cloneRepo(gitURL)
@@ -134,7 +134,7 @@ func (a *App) checkoutSourceCode(gitURL string, version string) string {
 
 func (a *App) buildProvider(dir string) {
 	// #nosec G204
-	bashCmd := exec.Command("sh", "-c", "cd "+a.cliDir+"/"+dir+" && make build")
+	bashCmd := exec.Command("sh", "-c", "cd "+a.Config.ProvidersCacheDir+"/"+dir+" && make build")
 
 	var stdBuffer bytes.Buffer
 	mw := io.MultiWriter(os.Stdout, &stdBuffer)
@@ -149,14 +149,14 @@ func (a *App) buildProvider(dir string) {
 }
 
 func (a *App) moveBinaryToCorrectLocation(providerName string, version string, executableName string) {
-	filePath := a.terraformProviderDir + "/registry.terraform.io/" + providerName + "/" + version + "/darwin_arm64"
+	filePath := a.Config.TerraformPluginDir + "/registry.terraform.io/" + providerName + "/" + version + "/darwin_arm64"
 	err := os.MkdirAll(filePath, 0777)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	pathOfExecutable := a.homeDir + "/go/bin/" + executableName
+	pathOfExecutable := a.Config.BaseDir + "/go/bin/" + executableName
 	log.Print("Move from " + pathOfExecutable + "to" + filePath + "/" + executableName + "_v" + version + "_x5")
 	err = os.Rename(pathOfExecutable, filePath+"/"+executableName+"_v"+version+"_x5")
 

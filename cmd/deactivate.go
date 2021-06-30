@@ -11,7 +11,8 @@ func deactivateCmd() *cobra.Command {
 		Short: "Deactivate the usage of M1 provider helper",
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			a := app.New(app.DefaultTerraformProviderDir, app.DefaultBackupDir)
+			a := app.New()
+			a.Init()
 			a.Deactivate()
 
 			return nil
