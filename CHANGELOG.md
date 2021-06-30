@@ -1,4 +1,11 @@
 
+<a name="0.1.3"></a>
+## [0.1.3] - 2021-06-30
+### code refactoring
+- Move status application logic to app.go. (ab65a7e)
+- Rewrite App.Config and make Out configurable. (ee65c8d)
+
+
 <a name="0.1.2"></a>
 ## [0.1.2] - 2021-06-25
 ### bug fixes
