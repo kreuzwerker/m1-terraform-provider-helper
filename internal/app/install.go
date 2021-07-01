@@ -132,9 +132,24 @@ func (a *App) checkoutSourceCode(gitURL string, version string) string {
 	return repoDir
 }
 
-func (a *App) buildProvider(dir string) {
+func (a *App) createBuildCommand(providerName string) string {
+	buildCommands := make(map[string]string)
+	buildCommands["default"] = "make build"
+	buildCommands["hashicorp/aws"] = "cd tools && go get -d github.com/pavius/impi/cmd/impi && cd .. && make tools && make build"
+
+	buildCommand, exists := buildCommands[providerName]
+
+	if exists {
+		return buildCommand
+	}
+
+	return buildCommands["default"]
+}
+
+func (a *App) buildProvider(dir string, providerName string) {
+	buildCommand := a.createBuildCommand(providerName)
 	// #nosec G204
-	bashCmd := exec.Command("sh", "-c", "cd "+a.Config.ProvidersCacheDir+"/"+dir+" && make build")
+	bashCmd := exec.Command("sh", "-c", "cd "+a.Config.ProvidersCacheDir+"/"+dir+" && "+buildCommand)
 
 	var stdBuffer bytes.Buffer
 	mw := io.MultiWriter(os.Stdout, &stdBuffer)
@@ -173,7 +188,7 @@ func (a *App) Install(providerName string, version string) bool {
 	fmt.Fprintf(os.Stdout, "GitRepo:%s\n", gitRepo)
 
 	sourceCodeDir := a.checkoutSourceCode(gitRepo, version)
-	a.buildProvider((sourceCodeDir))
+	a.buildProvider(sourceCodeDir, providerName)
 
 	name := strings.Split(gitRepo, "/")[1]
 	a.moveBinaryToCorrectLocation(providerName, version, name)
