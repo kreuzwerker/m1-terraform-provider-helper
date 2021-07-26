@@ -1,0 +1,1 @@
+### Terraform providers supporting darwin arm64
