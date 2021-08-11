@@ -8,6 +8,7 @@ builds:
       - darwin
     goarch:
       - arm64
+      - amd64
     goarm:
       - 7
     main: ./cmd/m1-terraform-provider-helper
