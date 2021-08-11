@@ -1,4 +1,10 @@
 
+<a name="0.2.1"></a>
+## [0.2.1] - 2021-08-11
+### bug fixes
+- add linux os and amd64 arch for brew formula (ac07195)
+
+
 <a name="0.2.0"></a>
 ## [0.2.0] - 2021-07-01
 ### features
