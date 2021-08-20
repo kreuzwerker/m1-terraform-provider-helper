@@ -1,13 +1,11 @@
 import requests 
 
+RESULT_MARKDOWN = "docs/provider_information.md"
 versions_available = 0
 
 def getting_providers():
-
     print("starting provider search")
-
     provider_names = []
-
     page_count = 1
 
     while True:
@@ -27,50 +25,40 @@ def getting_providers():
             break
     
     print("done with the providers")
-
     return provider_names
 
-def get_versions(clean_provider_names):
 
+def get_publishing_date_of_version(provider, version):
+    res = requests.get(url=f"https://registry.terraform.io/v1/providers/{provider}/{version}")
+    json = res.json()
+    return json["published_at"].split("T")[0]
+
+def get_darwin_arm64_information_of_provider(provider):
+    global versions_available
+
+    res = requests.get(url=f"https://registry.terraform.io/v1/providers/{provider}/versions")
+    json = res.json()
+    for version in json["versions"]:
+        for platform in version["platforms"]:
+            if platform["os"] == "darwin" and platform["arch"] == "arm64":
+                published_at = get_publishing_date_of_version(provider, version['version'])
+                versions_available += 1
+                return  {"version": version["version"], "date": published_at}
+
+    return {"version": "no version yet", "date": " "}
+
+def get_versions(providers):
     print("starting version search")
 
-    c = 0
+    for index, provider in enumerate(providers):
+        provider["version"] = get_darwin_arm64_information_of_provider(provider['name'])
 
-    for i in clean_provider_names:
+        if index % 5 == 0:
+            print(f"{index} versions found")
+            break
 
-        response = requests.get(url=f"https://registry.terraform.io/v1/providers/{i['name']}/versions")
-
-        yes2 = response.json()
-
-        def getting_versions():
-
-            global versions_available
-
-            try:
-                for m in yes2["versions"]:
-                    for h in m["platforms"]:
-                        if h["os"] == "darwin" and h["arch"] == "arm64":
-                            next_response = requests.get(url=f"https://registry.terraform.io/v1/providers/{i['name']}/{m['version']}")
-                            next_yes = next_response.json()
-                            i["version"] = {"version": m["version"], "date": next_yes["published_at"].split("T")[0]}
-                            versions_available += 1
-                            return 
-                i["version"] = {"version": "no version yet", "date": " "}
-                return 
-            except:
-                print(f"{i} hello")
-                return  
-        
-        c += 1
-
-        if c % 50 == 0:
-            print(f"{c} versions found")
-        
-        getting_versions()
-        
     print("done with the versions")
-
-    return clean_provider_names
+    return providers
 
 def write_to_table(version_dict):
 
@@ -80,10 +68,10 @@ def write_to_table(version_dict):
 
     percentage = round(100/len(version_dict) * versions_available, 2)
 
-    tablefile = open("provider_information.md", "w")
+    tablefile = open(RESULT_MARKDOWN, "w")
     tablefile.write("### Terraform providers supporting darwin arm64")
 
-    tablefile = open("real_table.md", "a")
+    tablefile = open(RESULT_MARKDOWN, "a")
     tablefile.write("\nThe following list gives an overview, which Terraform providers offer a version supporting darwin arm64 architecture.\nIf a version is available, the table provides the first published version supporting darwin arm64 and its publishing date.")
     tablefile.write(f"\n#### Current percentage of providers that offer a version supporting darwin arm64:")
     tablefile.write(f"\n## {percentage}%")
@@ -98,8 +86,3 @@ def write_to_table(version_dict):
 providers = getting_providers()
 versions = get_versions(providers)
 write_to_table(versions)
-
-
-
-
-
