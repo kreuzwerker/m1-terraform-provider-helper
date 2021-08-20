@@ -53,9 +53,8 @@ def get_versions(providers):
     for index, provider in enumerate(providers):
         provider["version"] = get_darwin_arm64_information_of_provider(provider['name'])
 
-        if index % 5 == 0:
+        if index % 50 == 0:
             print(f"{index} versions found")
-            break
 
     print("done with the versions")
     return providers
