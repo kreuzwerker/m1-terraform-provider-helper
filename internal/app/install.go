@@ -186,6 +186,7 @@ func (a *App) moveBinaryToCorrectLocation(providerName string, version string, e
 	if len(version) == 0 {
 		version = "master"
 	}
+
 	filePath := a.Config.TerraformPluginDir + "/registry.terraform.io/" + providerName + "/" + version + "/darwin_arm64"
 	err := os.MkdirAll(filePath, 0777)
 
