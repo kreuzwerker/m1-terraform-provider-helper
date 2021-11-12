@@ -34,6 +34,19 @@ func CheckIfError(err error) {
 	os.Exit(1)
 }
 
+func executeBashCommand(command string) {
+	bashCmd := exec.Command("sh", "-c", command)
+
+	var stdBuffer bytes.Buffer
+	mw := io.MultiWriter(os.Stdout, &stdBuffer)
+	bashCmd.Stdout = mw
+	bashCmd.Stderr = mw
+
+	if err := bashCmd.Run(); err != nil {
+		log.Fatalf("Bash code did not run successfully: %s", err)
+	}
+}
+
 func (a *App) getProviderData(providerName string) Provider {
 	url := "https://registry.terraform.io/v1/providers/" + providerName
 
@@ -119,14 +132,20 @@ func (a *App) checkoutSourceCode(gitURL string, version string) string {
 
 	w, err := r.Worktree()
 	CheckIfError(err)
-	log.Println("version" + version)
+
+	// Clean the repository
+	executeBashCommand("git reset --hard && git clean -d -f -q")
 
 	if len(version) > 0 {
+		log.Println("version: " + version)
 		ref, _ := r.ResolveRevision(plumbing.Revision(version))
 		err = w.Checkout(&git.CheckoutOptions{
 			Hash: *ref,
 		})
 		CheckIfError(err)
+	} else {
+		log.Println("No version specified, pulling and checking out main branch")
+		executeBashCommand("git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@' | xargs git checkout && git pull")
 	}
 
 	return repoDir
@@ -164,6 +183,10 @@ func (a *App) buildProvider(dir string, providerName string) {
 }
 
 func (a *App) moveBinaryToCorrectLocation(providerName string, version string, executableName string) {
+	if len(version) == 0 {
+		version = "master"
+	}
+
 	filePath := a.Config.TerraformPluginDir + "/registry.terraform.io/" + providerName + "/" + version + "/darwin_arm64"
 	err := os.MkdirAll(filePath, 0777)
 
@@ -172,8 +195,10 @@ func (a *App) moveBinaryToCorrectLocation(providerName string, version string, e
 	}
 
 	pathOfExecutable := a.Config.BaseDir + "/go/bin/" + executableName
-	log.Print("Move from " + pathOfExecutable + "to" + filePath + "/" + executableName + "_v" + version + "_x5")
-	err = os.Rename(pathOfExecutable, filePath+"/"+executableName+"_v"+version+"_x5")
+	newPath := filePath + "/" + executableName + "_" + version + "_x5"
+
+	log.Print("Move from " + pathOfExecutable + "to" + newPath)
+	err = os.Rename(pathOfExecutable, newPath)
 
 	if err != nil {
 		log.Fatal(err)
@@ -182,10 +207,10 @@ func (a *App) moveBinaryToCorrectLocation(providerName string, version string, e
 
 func (a *App) Install(providerName string, version string) bool {
 	providerData := a.getProviderData(providerName)
-	fmt.Fprintf(os.Stdout, "Repo:%s\n", providerData.Repo)
+	fmt.Fprintf(os.Stdout, "Repo: %s\n", providerData.Repo)
 
 	gitRepo := strings.Replace(providerData.Repo, "https://github.com/", "git@github.com:", 1)
-	fmt.Fprintf(os.Stdout, "GitRepo:%s\n", gitRepo)
+	fmt.Fprintf(os.Stdout, "GitRepo: %s\n", gitRepo)
 
 	sourceCodeDir := a.checkoutSourceCode(gitRepo, version)
 	a.buildProvider(sourceCodeDir, providerName)
