@@ -1,4 +1,10 @@
 
+<a name="0.2.2"></a>
+## [0.2.2] - 2021-11-12
+### features
+ - Clean provider repo when running install command
+ - Pull main branch when providing no version
+
 <a name="0.2.1"></a>
 ## [0.2.1] - 2021-08-11
 ### bug fixes
