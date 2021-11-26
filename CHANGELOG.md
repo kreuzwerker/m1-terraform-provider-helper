@@ -1,4 +1,9 @@
 
+<a name="0.2.3"></a>
+## [0.2.3] - 2021-11-26
+### bug fixes
+ - Add building of linux binary to fix brew-tap issues.
+
 <a name="0.2.2"></a>
 ## [0.2.2] - 2021-11-12
 ### features
