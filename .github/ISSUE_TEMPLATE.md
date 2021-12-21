@@ -24,5 +24,5 @@
 ## Your Environment
 
 - OS: {Please write here}
-- passgen version: {Please write here}
+- m1-terraform-provider-helper version: {Please write here}
 
