@@ -4,8 +4,8 @@
 
 ### Go ###
 # Binaries for programs and plugins
-passgen
-!cmd/passgen
+m1-terraform-provider-helper
+!cmd/m1-terraform-provider-helper
 *.exe
 *.exe~
 *.dll

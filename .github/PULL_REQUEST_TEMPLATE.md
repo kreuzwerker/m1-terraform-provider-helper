@@ -1,4 +1,4 @@
-<!-- Thank you for your contribution to passgen! Please replace {Please write here} with your description -->
+<!-- Thank you for your contribution to m1-terraform-provider-helper! Please replace {Please write here} with your description -->
 
 
 ## What does this do / why do we need it?
