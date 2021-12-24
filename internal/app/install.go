@@ -34,15 +34,18 @@ func CheckIfError(err error) {
 	os.Exit(1)
 }
 
-func executeBashCommand(command string) {
-	bashCmd := exec.Command("sh", "-c", command)
+func executeBashCommand(command string, baseDir string) {
+	shExecutable, _ := exec.LookPath("sh")
 
-	var stdBuffer bytes.Buffer
-	mw := io.MultiWriter(os.Stdout, &stdBuffer)
-	bashCmd.Stdout = mw
-	bashCmd.Stderr = mw
+	cmd := &exec.Cmd{
+		Path:   shExecutable,
+		Args:   []string{shExecutable, "-c", command},
+		Stdout: os.Stdout,
+		Stderr: os.Stderr,
+		Dir:    baseDir,
+	}
 
-	if err := bashCmd.Run(); err != nil {
+	if err := cmd.Run(); err != nil {
 		log.Fatalf("Bash code did not run successfully: %s", err)
 	}
 }
@@ -134,7 +137,7 @@ func (a *App) checkoutSourceCode(gitURL string, version string) string {
 	CheckIfError(err)
 
 	// Clean the repository
-	executeBashCommand("git reset --hard && git clean -d -f -q")
+	executeBashCommand("git reset --hard && git clean -d -f -q", path)
 
 	if len(version) > 0 {
 		log.Println("version: " + version)
@@ -145,7 +148,7 @@ func (a *App) checkoutSourceCode(gitURL string, version string) string {
 		CheckIfError(err)
 	} else {
 		log.Println("No version specified, pulling and checking out main branch")
-		executeBashCommand("git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@' | xargs git checkout && git pull")
+		executeBashCommand("git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@' | xargs git checkout && git pull", path)
 	}
 
 	return repoDir
