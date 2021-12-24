@@ -1,4 +1,10 @@
 
+<a name="0.2.4"></a>
+## [0.2.4] - 2021-12-24
+### bug fixes
+- Run git commands in correct directory. (6cbfcf2)
+
+
 <a name="0.2.3"></a>
 ## [0.2.3] - 2021-11-26
 ### bug fixes
