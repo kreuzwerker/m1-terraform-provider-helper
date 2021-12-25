@@ -32,11 +32,11 @@ Flags:
 ```
 
 Example:
-You want to install the `terraform-provider-vault` in version `2.10.0` because you are using it in a project and let's assume it has no pre-build binary for Mac M1:
+You want to install the `terraform-provider-vault` in version `v2.10.0` because you are using it in a project and let's assume it has no pre-build binary for Mac M1:
 
 ```sh
 m1-terraform-provider-helper activate # (In case you have not activated the helper)
-m1-terraform-provider-helper install hashicorp/vault -v 2.10.0 # Install and compile
+m1-terraform-provider-helper install hashicorp/vault -v v2.10.0 # Install and compile
 ```
 
 ### Testing
