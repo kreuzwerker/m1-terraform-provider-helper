@@ -197,10 +197,10 @@ func (a *App) moveBinaryToCorrectLocation(providerName string, version string, e
 		log.Fatal(err)
 	}
 
-	pathOfExecutable := a.Config.BaseDir + "/go/bin/" + executableName
+	pathOfExecutable := a.Config.GoPath + "/bin/" + executableName
 	newPath := filePath + "/" + executableName + "_" + version + "_x5"
 
-	log.Print("Move from " + pathOfExecutable + "to" + newPath)
+	log.Print("Move from " + pathOfExecutable + " to " + newPath)
 	err = os.Rename(pathOfExecutable, newPath)
 
 	if err != nil {

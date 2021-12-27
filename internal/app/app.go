@@ -16,6 +16,7 @@ type Config struct {
 	TerraformPluginDir       string
 	TerraformPluginBackupDir string
 	BaseDir                  string
+	GoPath                   string
 	ProvidersCacheDir        string
 }
 
@@ -34,6 +35,7 @@ func New() *App {
 	app := &App{
 		Config: &Config{
 			BaseDir:                  BaseDir,
+			GoPath:                   GetCurrentGoPath(),
 			TerraformPluginDir:       BaseDir + DefaultTerraformPluginDir,
 			TerraformPluginBackupDir: BaseDir + DefaultTerraformPluginBackupDir,
 			ProvidersCacheDir:        BaseDir + DefaultProvidersCacheDir,
