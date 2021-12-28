@@ -10,5 +10,6 @@ func GetCurrentGoPath() string {
 	if path == "" {
 		path = build.Default.GOPATH
 	}
+
 	return path
 }
