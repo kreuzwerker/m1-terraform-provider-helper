@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -154,35 +156,45 @@ func (a *App) checkoutSourceCode(gitURL string, version string) string {
 	return repoDir
 }
 
-func (a *App) createBuildCommand(providerName string) string {
-	buildCommands := make(map[string]string)
-	buildCommands["default"] = "make build"
-	buildCommands["hashicorp/aws"] = "cd tools && go get -d github.com/pavius/impi/cmd/impi && cd .. && make tools && make build"
+func extractMajorVersionAsNumber(version string) int {
+	sampleRegexp := regexp.MustCompile(`\d`)
 
-	buildCommand, exists := buildCommands[providerName]
+	result := sampleRegexp.FindString(version)
+	number, _ := strconv.Atoi(result)
 
-	if exists {
-		return buildCommand
-	}
-
-	return buildCommands["default"]
+	return number
 }
 
-func (a *App) buildProvider(dir string, providerName string) {
-	buildCommand := a.createBuildCommand(providerName)
-	// #nosec G204
-	bashCmd := exec.Command("sh", "-c", "cd "+a.Config.ProvidersCacheDir+"/"+dir+" && "+buildCommand)
+func createBuildCommand(providerName string, version string) string {
+	majorVersionNumberAsInt := extractMajorVersionAsNumber(version)
 
-	var stdBuffer bytes.Buffer
-	mw := io.MultiWriter(os.Stdout, &stdBuffer)
-	bashCmd.Stdout = mw
-	bashCmd.Stderr = mw
+	buildCommands := make(map[string]map[int]string)
+	buildCommands["default"] = map[int]string{0: "make build"}
+	buildCommands["hashicorp/aws"] = make(map[int]string)
+	buildCommands["hashicorp/aws"][0] = "make tools && make fmt && gofmt -s -w ./tools.go && make build"
+	buildCommands["hashicorp/aws"][3] = "cd tools && go get -d github.com/pavius/impi/cmd/impi && cd .. && make tools && make build"
 
-	if err := bashCmd.Run(); err != nil {
-		log.Fatalf("Bash code did not run successfully: %s", err)
+	buildCommandMap, exists := buildCommands[providerName]
+
+	if exists {
+		var foundBuilCommand string
+
+		for k := range buildCommandMap {
+			if majorVersionNumberAsInt >= k {
+				foundBuilCommand = buildCommands[providerName][k]
+			}
+		}
+
+		return foundBuilCommand
 	}
 
-	log.Println(stdBuffer.String())
+	return buildCommands["default"][0]
+}
+
+func (a *App) buildProvider(dir string, providerName string, version string) {
+	buildCommand := createBuildCommand(providerName, version)
+	// #nosec G204
+	executeBashCommand(buildCommand, a.Config.ProvidersCacheDir+"/"+dir)
 }
 
 func (a *App) moveBinaryToCorrectLocation(providerName string, version string, executableName string) {
@@ -216,7 +228,7 @@ func (a *App) Install(providerName string, version string) bool {
 	fmt.Fprintf(os.Stdout, "GitRepo: %s\n", gitRepo)
 
 	sourceCodeDir := a.checkoutSourceCode(gitRepo, version)
-	a.buildProvider(sourceCodeDir, providerName)
+	a.buildProvider(sourceCodeDir, providerName, version)
 
 	name := strings.Split(gitRepo, "/")[1]
 	a.moveBinaryToCorrectLocation(providerName, version, name)
