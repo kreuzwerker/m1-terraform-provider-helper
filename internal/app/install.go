@@ -165,6 +165,14 @@ func extractMajorVersionAsNumber(version string) int {
 	return number
 }
 
+func normalizeSemver(version string) string {
+	if strings.HasPrefix(version, "v") {
+		return version[1:]
+	}
+
+	return version
+}
+
 func createBuildCommand(providerName string, version string) string {
 	majorVersionNumberAsInt := extractMajorVersionAsNumber(version)
 
@@ -200,6 +208,8 @@ func (a *App) buildProvider(dir string, providerName string, version string) {
 func (a *App) moveBinaryToCorrectLocation(providerName string, version string, executableName string) {
 	if len(version) == 0 {
 		version = "master"
+	} else {
+		version = normalizeSemver(version)
 	}
 
 	filePath := a.Config.TerraformPluginDir + "/registry.terraform.io/" + providerName + "/" + version + "/darwin_arm64"
