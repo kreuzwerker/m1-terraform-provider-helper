@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -23,6 +25,11 @@ const requestTimeoutSeconds int = 2
 type Provider struct {
 	Repo        string `json:"source"`
 	Description string `json:"description"`
+}
+
+type BuildCommandInformation struct {
+	command         string
+	startingVersion int
 }
 
 func CheckIfError(err error) {
@@ -154,40 +161,63 @@ func (a *App) checkoutSourceCode(gitURL string, version string) string {
 	return repoDir
 }
 
-func (a *App) createBuildCommand(providerName string) string {
-	buildCommands := make(map[string]string)
-	buildCommands["default"] = "make build"
-	buildCommands["hashicorp/aws"] = "cd tools && go get -d github.com/pavius/impi/cmd/impi && cd .. && make tools && make build"
+func extractMajorVersionAsNumber(version string) int {
+	sampleRegexp := regexp.MustCompile(`\d`)
 
-	buildCommand, exists := buildCommands[providerName]
+	result := sampleRegexp.FindString(version)
+	number, _ := strconv.Atoi(result)
 
-	if exists {
-		return buildCommand
-	}
-
-	return buildCommands["default"]
+	return number
 }
 
-func (a *App) buildProvider(dir string, providerName string) {
-	buildCommand := a.createBuildCommand(providerName)
-	// #nosec G204
-	bashCmd := exec.Command("sh", "-c", "cd "+a.Config.ProvidersCacheDir+"/"+dir+" && "+buildCommand)
-
-	var stdBuffer bytes.Buffer
-	mw := io.MultiWriter(os.Stdout, &stdBuffer)
-	bashCmd.Stdout = mw
-	bashCmd.Stderr = mw
-
-	if err := bashCmd.Run(); err != nil {
-		log.Fatalf("Bash code did not run successfully: %s", err)
+func normalizeSemver(version string) string {
+	if strings.HasPrefix(version, "v") {
+		return version[1:]
 	}
 
-	log.Println(stdBuffer.String())
+	return version
+}
+
+func createBuildCommand(providerName string, version string) string {
+	majorVersionNumberAsInt := extractMajorVersionAsNumber(version)
+
+	const three = 3
+
+	buildCommands := make(map[string][]BuildCommandInformation)
+	buildCommands["default"] = []BuildCommandInformation{{command: "make build", startingVersion: 0}}
+	buildCommands["hashicorp/aws"] = []BuildCommandInformation{
+		{command: "make tools && make fmt && gofmt -s -w ./tools.go && make build", startingVersion: 0},
+		{command: "cd tools && go get -d github.com/pavius/impi/cmd/impi && cd .. && make tools && make build", startingVersion: three},
+	}
+
+	buildCommandMap, exists := buildCommands[providerName]
+
+	if exists {
+		var foundBuildCommand string
+
+		for _, v := range buildCommandMap {
+			if majorVersionNumberAsInt >= v.startingVersion {
+				foundBuildCommand = v.command
+			}
+		}
+
+		return foundBuildCommand
+	}
+
+	return buildCommands["default"][0].command
+}
+
+func (a *App) buildProvider(dir string, providerName string, version string) {
+	buildCommand := createBuildCommand(providerName, version)
+	// #nosec G204
+	executeBashCommand(buildCommand, a.Config.ProvidersCacheDir+"/"+dir)
 }
 
 func (a *App) moveBinaryToCorrectLocation(providerName string, version string, executableName string) {
 	if len(version) == 0 {
 		version = "master"
+	} else {
+		version = normalizeSemver(version)
 	}
 
 	filePath := a.Config.TerraformPluginDir + "/registry.terraform.io/" + providerName + "/" + version + "/darwin_arm64"
@@ -197,10 +227,10 @@ func (a *App) moveBinaryToCorrectLocation(providerName string, version string, e
 		log.Fatal(err)
 	}
 
-	pathOfExecutable := a.Config.BaseDir + "/go/bin/" + executableName
+	pathOfExecutable := a.Config.GoPath + "/bin/" + executableName
 	newPath := filePath + "/" + executableName + "_" + version + "_x5"
 
-	log.Print("Move from " + pathOfExecutable + "to" + newPath)
+	log.Print("Move from " + pathOfExecutable + " to " + newPath)
 	err = os.Rename(pathOfExecutable, newPath)
 
 	if err != nil {
@@ -216,7 +246,7 @@ func (a *App) Install(providerName string, version string) bool {
 	fmt.Fprintf(os.Stdout, "GitRepo: %s\n", gitRepo)
 
 	sourceCodeDir := a.checkoutSourceCode(gitRepo, version)
-	a.buildProvider(sourceCodeDir, providerName)
+	a.buildProvider(sourceCodeDir, providerName, version)
 
 	name := strings.Split(gitRepo, "/")[1]
 	a.moveBinaryToCorrectLocation(providerName, version, name)

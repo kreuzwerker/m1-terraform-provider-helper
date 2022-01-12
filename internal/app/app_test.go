@@ -28,7 +28,11 @@ func setupTestAppInstance(t *testing.T) (app.App, *bytes.Buffer) {
 	tmpDir := t.TempDir()
 	buf := new(bytes.Buffer)
 	config := app.Config{
-		tmpDir + "/plugins", tmpDir + "/plugins_backup", tmpDir, tmpDir + "/cliCache",
+		TerraformPluginDir:       tmpDir + "/plugins",
+		TerraformPluginBackupDir: tmpDir + "/plugins_backup",
+		BaseDir:                  tmpDir,
+		GoPath:                   app.GetCurrentGoPath(),
+		ProvidersCacheDir:        tmpDir + "/cliCache",
 	}
 	app := app.App{
 		Config: &config,

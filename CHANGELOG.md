@@ -1,4 +1,11 @@
 
+<a name="0.2.5"></a>
+## [0.2.5] - 2022-01-08
+### bug fixes
+- Provide different build commands for different provider versions. (1a619ca)
+- respect GOPATH environment variable (892628c)
+
+
 <a name="0.2.4"></a>
 ## [0.2.4] - 2021-12-24
 ### bug fixes
