@@ -25,6 +25,7 @@ Available Commands:
   deactivate  Deactivate the usage of M1 provider helper
   help        Help about any command
   install     Downloads (and compiles) a terraform provider for the M1 chip
+  list        Lists all available providers and their versions
   status      Shows the status of the m1 provider installations
 
 Flags:
@@ -38,6 +39,8 @@ You want to install the `terraform-provider-vault` in version `v2.10.0` because 
 m1-terraform-provider-helper activate # (In case you have not activated the helper)
 m1-terraform-provider-helper install hashicorp/vault -v v2.10.0 # Install and compile
 ```
+
+## Development
 
 ### Testing
 
