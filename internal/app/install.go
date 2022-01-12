@@ -27,6 +27,11 @@ type Provider struct {
 	Description string `json:"description"`
 }
 
+type BuildCommandInformation struct {
+	command         string
+	startingVersion int
+}
+
 func CheckIfError(err error) {
 	if err == nil {
 		return
@@ -165,30 +170,41 @@ func extractMajorVersionAsNumber(version string) int {
 	return number
 }
 
+func normalizeSemver(version string) string {
+	if strings.HasPrefix(version, "v") {
+		return version[1:]
+	}
+
+	return version
+}
+
 func createBuildCommand(providerName string, version string) string {
 	majorVersionNumberAsInt := extractMajorVersionAsNumber(version)
 
-	buildCommands := make(map[string]map[int]string)
-	buildCommands["default"] = map[int]string{0: "make build"}
-	buildCommands["hashicorp/aws"] = make(map[int]string)
-	buildCommands["hashicorp/aws"][0] = "make tools && make fmt && gofmt -s -w ./tools.go && make build"
-	buildCommands["hashicorp/aws"][3] = "cd tools && go get -d github.com/pavius/impi/cmd/impi && cd .. && make tools && make build"
+	const three = 3
+
+	buildCommands := make(map[string][]BuildCommandInformation)
+	buildCommands["default"] = []BuildCommandInformation{{command: "make build", startingVersion: 0}}
+	buildCommands["hashicorp/aws"] = []BuildCommandInformation{
+		{command: "make tools && make fmt && gofmt -s -w ./tools.go && make build", startingVersion: 0},
+		{command: "cd tools && go get -d github.com/pavius/impi/cmd/impi && cd .. && make tools && make build", startingVersion: three},
+	}
 
 	buildCommandMap, exists := buildCommands[providerName]
 
 	if exists {
-		var foundBuilCommand string
+		var foundBuildCommand string
 
-		for k := range buildCommandMap {
-			if majorVersionNumberAsInt >= k {
-				foundBuilCommand = buildCommands[providerName][k]
+		for _, v := range buildCommandMap {
+			if majorVersionNumberAsInt >= v.startingVersion {
+				foundBuildCommand = v.command
 			}
 		}
 
-		return foundBuilCommand
+		return foundBuildCommand
 	}
 
-	return buildCommands["default"][0]
+	return buildCommands["default"][0].command
 }
 
 func (a *App) buildProvider(dir string, providerName string, version string) {
@@ -200,6 +216,8 @@ func (a *App) buildProvider(dir string, providerName string, version string) {
 func (a *App) moveBinaryToCorrectLocation(providerName string, version string, executableName string) {
 	if len(version) == 0 {
 		version = "master"
+	} else {
+		version = normalizeSemver(version)
 	}
 
 	filePath := a.Config.TerraformPluginDir + "/registry.terraform.io/" + providerName + "/" + version + "/darwin_arm64"
