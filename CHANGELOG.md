@@ -1,4 +1,11 @@
 
+<a name="0.3.1"></a>
+## [0.3.1] - 2022-01-12
+### bug fixes
+- Adapt buildCommand test to new function signature. (f6e282d)
+- Add build command for helm provider. (9169996)
+
+
 <a name="0.3.0"></a>
 ## [0.3.0] - 2022-01-12
 ### bug fixes
