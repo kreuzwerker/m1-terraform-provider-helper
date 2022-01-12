@@ -19,17 +19,17 @@ func TestExtractVersionAsNumber(t *testing.T) {
 func TestCreateBuildCommand(t *testing.T) {
 	var buildCommand string
 	var expectedBuildCommand string
-	buildCommand = createBuildCommand("datadog/datadog", "2.35.9")
+	buildCommand = createBuildCommand("datadog/datadog", "2.35.9", "")
 	expectedBuildCommand = "make build"
 	if buildCommand != expectedBuildCommand {
 		t.Fatalf("buildCommand '%s' should be equal '%s'", buildCommand, expectedBuildCommand)
 	}
-	buildCommand = createBuildCommand("hashicorp/aws", "v2.71.0")
+	buildCommand = createBuildCommand("hashicorp/aws", "v2.71.0", "")
 	expectedBuildCommand = "make tools && make fmt && gofmt -s -w ./tools.go && make build"
 	if buildCommand != expectedBuildCommand {
 		t.Fatalf("buildCommand '%s' should be equal '%s'", buildCommand, expectedBuildCommand)
 	}
-	buildCommand = createBuildCommand("hashicorp/aws", "v3.0.0")
+	buildCommand = createBuildCommand("hashicorp/aws", "v3.0.0", "")
 	expectedBuildCommand = "cd tools && go get -d github.com/pavius/impi/cmd/impi && cd .. && make tools && make build"
 	if buildCommand != expectedBuildCommand {
 		t.Fatalf("buildCommand '%s' should be equal '%s'", buildCommand, expectedBuildCommand)
