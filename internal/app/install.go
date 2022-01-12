@@ -178,13 +178,14 @@ func normalizeSemver(version string) string {
 	return version
 }
 
-func createBuildCommand(providerName string, version string) string {
+func createBuildCommand(providerName string, version string, goPath string) string {
 	majorVersionNumberAsInt := extractMajorVersionAsNumber(version)
 
 	const three = 3
 
 	buildCommands := make(map[string][]BuildCommandInformation)
 	buildCommands["default"] = []BuildCommandInformation{{command: "make build", startingVersion: 0}}
+	buildCommands["hashicorp/helm"] = []BuildCommandInformation{{command: "make build && cp terraform-provider-helm " + goPath + "/bin/" + "terraform-provider-helm", startingVersion: 0}}
 	buildCommands["hashicorp/aws"] = []BuildCommandInformation{
 		{command: "make tools && make fmt && gofmt -s -w ./tools.go && make build", startingVersion: 0},
 		{command: "cd tools && go get -d github.com/pavius/impi/cmd/impi && cd .. && make tools && make build", startingVersion: three},
@@ -208,7 +209,7 @@ func createBuildCommand(providerName string, version string) string {
 }
 
 func (a *App) buildProvider(dir string, providerName string, version string) {
-	buildCommand := createBuildCommand(providerName, version)
+	buildCommand := createBuildCommand(providerName, version, a.Config.GoPath)
 	// #nosec G204
 	executeBashCommand(buildCommand, a.Config.ProvidersCacheDir+"/"+dir)
 }
