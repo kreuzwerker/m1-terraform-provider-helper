@@ -1,4 +1,14 @@
 
+<a name="0.3.0"></a>
+## [0.3.0] - 2022-01-12
+### bug fixes
+- Rework buildCommand structure to fix flaky test. (09f6303)
+- Path in .terraform.d should contain normalized version. (7f31380)
+
+### features
+- Add basic list command. (c005aa9)
+
+
 <a name="0.2.5"></a>
 ## [0.2.5] - 2022-01-08
 ### bug fixes
