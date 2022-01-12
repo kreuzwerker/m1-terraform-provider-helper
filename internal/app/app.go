@@ -5,6 +5,8 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 type App struct {
@@ -106,5 +108,54 @@ func (a *App) CheckStatus() {
 	} else {
 		fmt.Fprintln(a.Out, "Status: Not Active")
 		fmt.Fprintln(a.Out, "All providers are downloaded from the configured registries")
+	}
+}
+
+func visit(providerVersions map[string][]string) filepath.WalkFunc {
+	return func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if strings.HasSuffix(info.Name(), "darwin_arm64") {
+			allParts := strings.Split(path, "/")
+			providerName := allParts[len(allParts)-4] + "/" + allParts[len(allParts)-3]
+			version := allParts[len(allParts)-2]
+			entry, exists := providerVersions[providerName]
+
+			if exists {
+				// add version to existing entry
+				newEntry := append(entry, version)
+				providerVersions[providerName] = newEntry
+			} else {
+				// make new entry
+				newEntry := []string{version}
+				providerVersions[providerName] = newEntry
+			}
+		}
+
+		return nil
+	}
+}
+
+func (a *App) ListProviders() {
+	providerVersions := make(map[string][]string)
+
+	var root string
+	if a.IsTerraformPluginDirExistent() {
+		root = a.Config.TerraformPluginDir
+	} else {
+		fmt.Fprintf(a.Out, "Note: Not Active\n\n")
+		root = a.Config.TerraformPluginBackupDir
+	}
+
+	err := filepath.Walk(root, visit(providerVersions))
+
+	if err != nil {
+		panic(err)
+	}
+
+	for k, v := range providerVersions {
+		fmt.Fprintf(a.Out, "%s -> %s\n", k, strings.Join(v, ", "))
 	}
 }
