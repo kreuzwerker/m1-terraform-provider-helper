@@ -27,10 +27,10 @@ jobs:
       - name: Convert coverage
         uses: jandelgado/gcov2lcov-action@v1.0.5
         with:
-          infile: coverage.out
-          outfile: coverage.lcov
+          infile: ./dist/test_results/main/coverage.out
+          outfile: ./dist/test_results/main/coverage.lcov
       - name: Upload coverage
         uses: coverallsapp/github-action@1.1.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: coverage.lcov
+          path-to-lcov: ./dist/test_results/main/coverage.lcov
