@@ -29,7 +29,7 @@ GOTESTSUM_VERSION = 1.6.4
 GOLANGCI_VERSION = 1.38.0
 GITCHGLOG_VERSION = 0.14.2
 
-GOLANG_VERSION = 1.16
+GOLANG_VERSION = 1.17
 
 # Add the ability to override some variables
 # Use with care
