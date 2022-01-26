@@ -40,6 +40,16 @@ m1-terraform-provider-helper activate # (In case you have not activated the help
 m1-terraform-provider-helper install hashicorp/vault -v v2.10.0 # Install and compile
 ```
 
+### Providing custom build commands
+
+You can override the built-in build command handling by using the `--custom-build-command` flag.
+
+**Explanation**:
+The `install` commands relies on an internal `buildCommands` map to find the correct build command for an provider. For some important providers we have hardcoded different commands, but the default (and fallback) is `make build`. If that does not work for the provider you want to install, you can also pass a custom build command using the `--custom-build-command` flag.
+
+Please refer to the documentation of the provider to find out the build command.
+
+
 ## Development
 
 ### Testing
