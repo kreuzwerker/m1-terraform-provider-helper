@@ -10,6 +10,7 @@ import (
 
 func installCmd() *cobra.Command {
 	var versionString string
+
 	var customBuildCommand string
 
 	cmd := &cobra.Command{

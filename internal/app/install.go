@@ -210,6 +210,7 @@ func createBuildCommand(providerName string, version string, goPath string) stri
 
 func (a *App) buildProvider(dir string, providerName string, version string, customBuildCommand string) {
 	var buildCommand string
+
 	if len(customBuildCommand) > 0 {
 		fmt.Fprintf(os.Stdout, "Using custom build command: \"%s\n\"", customBuildCommand)
 		buildCommand = customBuildCommand
