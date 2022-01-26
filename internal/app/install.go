@@ -208,8 +208,14 @@ func createBuildCommand(providerName string, version string, goPath string) stri
 	return buildCommands["default"][0].command
 }
 
-func (a *App) buildProvider(dir string, providerName string, version string) {
-	buildCommand := createBuildCommand(providerName, version, a.Config.GoPath)
+func (a *App) buildProvider(dir string, providerName string, version string, customBuildCommand string) {
+	var buildCommand string
+	if len(customBuildCommand) > 0 {
+		fmt.Fprintf(os.Stdout, "Using custom build command: \"%s\n\"", customBuildCommand)
+		buildCommand = customBuildCommand
+	} else {
+		buildCommand = createBuildCommand(providerName, version, a.Config.GoPath)
+	}
 	// #nosec G204
 	executeBashCommand(buildCommand, a.Config.ProvidersCacheDir+"/"+dir)
 }
@@ -239,7 +245,7 @@ func (a *App) moveBinaryToCorrectLocation(providerName string, version string, e
 	}
 }
 
-func (a *App) Install(providerName string, version string) bool {
+func (a *App) Install(providerName string, version string, customBuildCommand string) bool {
 	providerData := a.getProviderData(providerName)
 	fmt.Fprintf(os.Stdout, "Repo: %s\n", providerData.Repo)
 
@@ -247,7 +253,7 @@ func (a *App) Install(providerName string, version string) bool {
 	fmt.Fprintf(os.Stdout, "GitRepo: %s\n", gitRepo)
 
 	sourceCodeDir := a.checkoutSourceCode(gitRepo, version)
-	a.buildProvider(sourceCodeDir, providerName, version)
+	a.buildProvider(sourceCodeDir, providerName, version, customBuildCommand)
 
 	name := strings.Split(gitRepo, "/")[1]
 	a.moveBinaryToCorrectLocation(providerName, version, name)
