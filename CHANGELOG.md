@@ -1,4 +1,10 @@
 
+<a name="0.4.0"></a>
+## [0.4.0] - 2022-01-27
+### features
+- Pass custom build command to install step. (21a4651)
+
+
 <a name="0.3.1"></a>
 ## [0.3.1] - 2022-01-12
 ### bug fixes
