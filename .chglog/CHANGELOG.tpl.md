@@ -5,7 +5,7 @@
 {{ range .Unreleased.CommitGroups -}}
 ### {{ .Title | lower }}
 {{ range .Commits -}}
-- {{ if .Scope }}**{{ .Scope }}:** {{ end }}{{ .Subject }} ({{ .Hash.Short }})
+- {{ if .Scope }}**{{ .Scope }}:** {{ end }}{{ .Subject }} ({{ .Hash.Long }})
 {{ end }}
 {{ end -}}
 {{ end -}}
@@ -17,7 +17,7 @@
 {{ range .CommitGroups -}}
 ### {{ .Title | lower }}
 {{ range .Commits -}}
-- {{ if .Scope }}**{{ .Scope }}:** {{ end }}{{ .Subject }} ({{ .Hash.Short }})
+- {{ if .Scope }}**{{ .Scope }}:** {{ end }}{{ .Subject }} ({{ .Hash.Long }})
 {{ end }}
 {{ end -}}
 
