@@ -25,12 +25,12 @@ changelog:
   sort: asc
 
 brews:
-  -
-    tap:
+  - tap:
       owner: kreuzwerker
       name: homebrew-taps
       token: "{{ .Env.GORELEASER_TOKEN }}"
-
+    dependencies:
+      - name: go
     download_strategy: CurlDownloadStrategy
     homepage: "https://github.com/kreuzwerker/m1-terraform-provider-helper"
     description: "CLI to support with downloading and compiling terraform providers for Mac with M1 chip."
