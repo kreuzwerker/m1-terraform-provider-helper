@@ -46,3 +46,14 @@ func TestNormalizeSemver(t *testing.T) {
 		t.Fatalf("version2 should be equal 2.34.5, not %s", version)
 	}
 }
+
+func TestExtractRepoNameFromUrl(t *testing.T) {
+	repoDir := extractRepoNameFromUrl("https://github.com/hashicorp/terraform-provider-github")
+	if repoDir != "terraform-provider-github" {
+		t.Fatalf("repoDir should be equal terraform-provider-github, not %s", repoDir)
+	}
+	repoDir = extractRepoNameFromUrl("git@github.com:hashicorp/terraform-provider-github")
+	if repoDir != "terraform-provider-github" {
+		t.Fatalf("repoDir should be equal terraform-provider-github, not %s", repoDir)
+	}
+}

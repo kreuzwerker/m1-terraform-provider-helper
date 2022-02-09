@@ -130,7 +130,7 @@ func (a *App) cloneRepo(gitURL string) {
 func (a *App) checkoutSourceCode(gitURL string, version string) string {
 	var r *git.Repository
 
-	repoDir := strings.Split(gitURL, "/")[1]
+	repoDir := extractRepoNameFromUrl(gitURL)
 	path := a.Config.ProvidersCacheDir + "/" + repoDir
 
 	if !a.isDirExistent(path) {
@@ -159,6 +159,11 @@ func (a *App) checkoutSourceCode(gitURL string, version string) string {
 	}
 
 	return repoDir
+}
+
+func extractRepoNameFromUrl(url string) string {
+	parts := strings.Split(url, "/")
+	return parts[len(parts)-1]
 }
 
 func extractMajorVersionAsNumber(version string) int {
@@ -250,7 +255,7 @@ func (a *App) Install(providerName string, version string, customBuildCommand st
 	providerData := a.getProviderData(providerName)
 	fmt.Fprintf(os.Stdout, "Repo: %s\n", providerData.Repo)
 
-	gitRepo := strings.Replace(providerData.Repo, "https://github.com/", "git@github.com:", 1)
+	gitRepo := providerData.Repo
 	fmt.Fprintf(os.Stdout, "GitRepo: %s\n", gitRepo)
 
 	sourceCodeDir := a.checkoutSourceCode(gitRepo, version)
