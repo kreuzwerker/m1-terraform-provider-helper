@@ -48,11 +48,11 @@ func TestNormalizeSemver(t *testing.T) {
 }
 
 func TestExtractRepoNameFromUrl(t *testing.T) {
-	repoDir := extractRepoNameFromUrl("https://github.com/hashicorp/terraform-provider-github")
+	repoDir := extractRepoNameFromURL("https://github.com/hashicorp/terraform-provider-github")
 	if repoDir != "terraform-provider-github" {
 		t.Fatalf("repoDir should be equal terraform-provider-github, not %s", repoDir)
 	}
-	repoDir = extractRepoNameFromUrl("git@github.com:hashicorp/terraform-provider-github")
+	repoDir = extractRepoNameFromURL("git@github.com:hashicorp/terraform-provider-github")
 	if repoDir != "terraform-provider-github" {
 		t.Fatalf("repoDir should be equal terraform-provider-github, not %s", repoDir)
 	}

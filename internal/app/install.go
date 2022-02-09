@@ -130,7 +130,7 @@ func (a *App) cloneRepo(gitURL string) {
 func (a *App) checkoutSourceCode(gitURL string, version string) string {
 	var r *git.Repository
 
-	repoDir := extractRepoNameFromUrl(gitURL)
+	repoDir := extractRepoNameFromURL(gitURL)
 	path := a.Config.ProvidersCacheDir + "/" + repoDir
 
 	if !a.isDirExistent(path) {
@@ -161,8 +161,9 @@ func (a *App) checkoutSourceCode(gitURL string, version string) string {
 	return repoDir
 }
 
-func extractRepoNameFromUrl(url string) string {
+func extractRepoNameFromURL(url string) string {
 	parts := strings.Split(url, "/")
+
 	return parts[len(parts)-1]
 }
 
