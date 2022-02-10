@@ -34,3 +34,23 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./dist/test_results/main/coverage.lcov
+  integration:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+      - name: Build a release binary
+        run: |
+          make build-release
+          ./dist/release/m1-terraform-provider-helper activate
+      - name: Run integration tests
+        run: |
+          ./dist/release/m1-terraform-provider-helper install hashicorp/github -v v3.0.0 --custom-build-command "go fmt ./... && make fmt && make build"
+          ./dist/release/m1-terraform-provider-helper install hashicorp/random -v v3.1.0 --custom-build-command "gofmt -s -w tools && make build"
+          ./dist/release/m1-terraform-provider-helper install mongodb/mongodbatlas -v v0.8.2 --custom-build-command "go fmt ./... && make build"
