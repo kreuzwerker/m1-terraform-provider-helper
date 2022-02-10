@@ -1,4 +1,11 @@
 
+<a name="0.5.0"></a>
+## [0.5.0] - 2022-02-10
+### bug fixes
+- Correct linting errors. ([11cbe6f](https://github.com/kreuzwerker/m1-terraform-provider-helper/commit/11cbe6ff29ab2c56fd800e743a02f60a69da5fe3))
+- Use https for cloning. ([c55b20a](https://github.com/kreuzwerker/m1-terraform-provider-helper/commit/c55b20aa2b03edb986bd200c4f58e84b3065f0b3))
+
+
 <a name="0.4.0"></a>
 ## [0.4.0] - 2022-01-27
 ### features
