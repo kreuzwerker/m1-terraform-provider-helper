@@ -171,8 +171,10 @@ func TestListProviders( t *testing.T) {
 		createDirIfNotExists(app.Config.TerraformPluginDir + "/registry.terraform.io/hashicorp/github/3.22.0/darwin_arm64")
 		app.ListProviders()
 		out := buf.String()
-		if out != "hashicorp/aws -> 3.20.0, 3.22.0\nhashicorp/github -> 3.20.0, 3.22.0\n" {
-			t.Fatalf("expected %#v, but got %#v", "", out)
+		outVariant1 := "hashicorp/aws -> 3.20.0, 3.22.0\nhashicorp/github -> 3.20.0, 3.22.0\n"
+		outVariant2 := "hashicorp/github -> 3.20.0, 3.22.0\nhashicorp/aws -> 3.20.0, 3.22.0\n"
+		if !(out == outVariant1 || out == outVariant2) {
+			t.Fatalf("expected %#v or %#v, but got %#v", outVariant1, outVariant2, out)
 		}
 	})
 }
