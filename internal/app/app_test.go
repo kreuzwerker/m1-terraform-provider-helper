@@ -151,3 +151,28 @@ func TestCheckStatus(t *testing.T) {
 		}
 	})
 }
+
+func TestListProviders( t *testing.T) {
+	t.Run("Should return no output for fresh install", func(t *testing.T) {
+		app, buf := setupTestAppInstance(t)
+		createDirIfNotExists(app.Config.TerraformPluginDir)
+		app.ListProviders()
+		out := buf.String()
+		if out != "" {
+			t.Fatalf("expected %#v, but got %#v", "", out)
+		}
+	})
+	t.Run("Should return correct output for two \"installed\" providers", func(t *testing.T) {
+		app, buf := setupTestAppInstance(t)
+		createDirIfNotExists(app.Config.TerraformPluginDir)
+		createDirIfNotExists(app.Config.TerraformPluginDir + "/registry.terraform.io/hashicorp/aws/3.22.0/darwin_arm64")
+		createDirIfNotExists(app.Config.TerraformPluginDir + "/registry.terraform.io/hashicorp/aws/3.20.0/darwin_arm64")
+		createDirIfNotExists(app.Config.TerraformPluginDir + "/registry.terraform.io/hashicorp/github/3.20.0/darwin_arm64")
+		createDirIfNotExists(app.Config.TerraformPluginDir + "/registry.terraform.io/hashicorp/github/3.22.0/darwin_arm64")
+		app.ListProviders()
+		out := buf.String()
+		if out != "hashicorp/aws -> 3.20.0, 3.22.0\nhashicorp/github -> 3.20.0, 3.22.0\n" {
+			t.Fatalf("expected %#v, but got %#v", "", out)
+		}
+	})
+}
