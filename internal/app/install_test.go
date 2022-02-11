@@ -57,3 +57,12 @@ func TestExtractRepoNameFromUrl(t *testing.T) {
 		t.Fatalf("repoDir should be equal terraform-provider-github, not %s", repoDir)
 	}
 }
+
+func TestCloneRepo(t *testing.T) {
+	tmpDir := t.TempDir()
+	fullPath := tmpDir + "/terraform-provider-random"
+	cloneRepo("https://github.com/hashicorp/terraform-provider-random", fullPath)
+	if !isDirExistent(fullPath) {
+		t.Fatalf("terraform-provider-random should be a dir inside %s", tmpDir)
+	}
+}
