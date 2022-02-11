@@ -1,11 +1,9 @@
 package app
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -98,28 +96,13 @@ func getProviderData(providerName string) Provider {
 	return data
 }
 
-func cloneRepo(gitURL string, parentDir string) {
-	if !isDirExistent(parentDir) {
-		err := os.Mkdir(parentDir, 0777)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
+func cloneRepo(gitURL string, fullPath string) {
+	_, err := git.PlainClone(fullPath, false, &git.CloneOptions{
+		URL:      gitURL,
+		Progress: os.Stdout,
+	})
 
-	command := "cd " + parentDir + " && git clone " + gitURL
-	log.Println("Executing" + command)
-	bashCmd := exec.Command("sh", "-c", command)
-
-	var stdBuffer bytes.Buffer
-	mw := io.MultiWriter(os.Stdout, &stdBuffer)
-	bashCmd.Stdout = mw
-	bashCmd.Stderr = mw
-
-	if err := bashCmd.Run(); err != nil {
-		log.Fatalf("Bash code did not run successfully: %s", err)
-	}
-
-	log.Println(stdBuffer.String())
+	CheckIfError(err)
 }
 
 // if repo is not check out yet
@@ -131,20 +114,20 @@ func checkoutSourceCode(baseDir string, gitURL string, version string) string {
 	var r *git.Repository
 
 	repoDir := extractRepoNameFromURL(gitURL)
-	path := baseDir + "/" + repoDir
+	fullPath := baseDir + "/" + repoDir
 
-	if !isDirExistent(path) {
-		cloneRepo(gitURL, baseDir)
+	if !isDirExistent(fullPath) {
+		cloneRepo(gitURL, fullPath)
 	}
 
-	r, err := git.PlainOpen(path)
+	r, err := git.PlainOpen(fullPath)
 	CheckIfError(err)
 
 	w, err := r.Worktree()
 	CheckIfError(err)
 
 	// Clean the repository
-	executeBashCommand("git reset --hard && git clean -d -f -q", path)
+	executeBashCommand("git reset --hard && git clean -d -f -q", fullPath)
 
 	if len(version) > 0 {
 		log.Println("version: " + version)
@@ -155,7 +138,7 @@ func checkoutSourceCode(baseDir string, gitURL string, version string) string {
 		CheckIfError(err)
 	} else {
 		log.Println("No version specified, pulling and checking out main branch")
-		executeBashCommand("git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@' | xargs git checkout && git pull", path)
+		executeBashCommand("git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@' | xargs git checkout && git pull", fullPath)
 	}
 
 	return repoDir
