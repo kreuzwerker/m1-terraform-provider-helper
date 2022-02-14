@@ -49,11 +49,11 @@ func New() *App {
 }
 
 func (a *App) Init() {
-	a.createDirIfNotExists(a.Config.ProvidersCacheDir)
+	createDirIfNotExists(a.Config.ProvidersCacheDir)
 }
 
-func (a *App) createDirIfNotExists(dir string) {
-	if !a.isDirExistent(dir) {
+func createDirIfNotExists(dir string) {
+	if !isDirExistent(dir) {
 		err := os.MkdirAll(dir, 0777)
 		if err != nil {
 			log.Fatal(err)
@@ -61,22 +61,22 @@ func (a *App) createDirIfNotExists(dir string) {
 	}
 }
 
-func (a *App) isDirExistent(dir string) bool {
+func isDirExistent(dir string) bool {
 	_, foldererr := os.Stat(dir)
 
 	return !os.IsNotExist(foldererr)
 }
 
 func (a *App) IsTerraformPluginDirExistent() bool {
-	return a.isDirExistent(a.Config.TerraformPluginDir)
+	return isDirExistent(a.Config.TerraformPluginDir)
 }
 
 func (a *App) Activate() {
-	if a.isDirExistent(a.Config.TerraformPluginDir) {
+	if isDirExistent(a.Config.TerraformPluginDir) {
 		fmt.Fprintln(a.Out, "Already activated")
 	} else {
-		if !a.isDirExistent(a.Config.TerraformPluginBackupDir) {
-			a.createDirIfNotExists(a.Config.TerraformPluginBackupDir)
+		if !isDirExistent(a.Config.TerraformPluginBackupDir) {
+			createDirIfNotExists(a.Config.TerraformPluginBackupDir)
 		}
 		err := os.Rename(a.Config.TerraformPluginBackupDir, a.Config.TerraformPluginDir)
 		if err != nil {
@@ -87,11 +87,11 @@ func (a *App) Activate() {
 }
 
 func (a *App) Deactivate() {
-	if a.isDirExistent(a.Config.TerraformPluginBackupDir) {
+	if isDirExistent(a.Config.TerraformPluginBackupDir) {
 		fmt.Fprintln(a.Out, "Already Deactivated")
 	} else {
-		if !a.isDirExistent(a.Config.TerraformPluginDir) {
-			a.createDirIfNotExists(a.Config.TerraformPluginDir)
+		if !isDirExistent(a.Config.TerraformPluginDir) {
+			createDirIfNotExists(a.Config.TerraformPluginDir)
 		}
 		err := os.Rename(a.Config.TerraformPluginDir, a.Config.TerraformPluginBackupDir)
 		if err != nil {

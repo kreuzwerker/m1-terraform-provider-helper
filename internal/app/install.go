@@ -1,11 +1,9 @@
 package app
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -57,7 +55,7 @@ func executeBashCommand(command string, baseDir string) {
 	}
 }
 
-func (a *App) getProviderData(providerName string) Provider {
+func getProviderData(providerName string) Provider {
 	url := "https://registry.terraform.io/v1/providers/" + providerName
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -98,28 +96,13 @@ func (a *App) getProviderData(providerName string) Provider {
 	return data
 }
 
-func (a *App) cloneRepo(gitURL string) {
-	if !a.isDirExistent(a.Config.ProvidersCacheDir) {
-		err := os.Mkdir(a.Config.ProvidersCacheDir, 0777)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
+func cloneRepo(gitURL string, fullPath string) {
+	_, err := git.PlainClone(fullPath, false, &git.CloneOptions{
+		URL:      gitURL,
+		Progress: os.Stdout,
+	})
 
-	command := "cd " + a.Config.ProvidersCacheDir + " && git clone " + gitURL
-	log.Println("Executing" + command)
-	bashCmd := exec.Command("sh", "-c", command)
-
-	var stdBuffer bytes.Buffer
-	mw := io.MultiWriter(os.Stdout, &stdBuffer)
-	bashCmd.Stdout = mw
-	bashCmd.Stderr = mw
-
-	if err := bashCmd.Run(); err != nil {
-		log.Fatalf("Bash code did not run successfully: %s", err)
-	}
-
-	log.Println(stdBuffer.String())
+	CheckIfError(err)
 }
 
 // if repo is not check out yet
@@ -127,24 +110,24 @@ func (a *App) cloneRepo(gitURL string) {
 // if already exists: dont clone, simply cd
 // on both casees: checkout version
 // return path to dir.
-func (a *App) checkoutSourceCode(gitURL string, version string) string {
+func checkoutSourceCode(baseDir string, gitURL string, version string) string {
 	var r *git.Repository
 
 	repoDir := extractRepoNameFromURL(gitURL)
-	path := a.Config.ProvidersCacheDir + "/" + repoDir
+	fullPath := baseDir + "/" + repoDir
 
-	if !a.isDirExistent(path) {
-		a.cloneRepo(gitURL)
+	if !isDirExistent(fullPath) {
+		cloneRepo(gitURL, fullPath)
 	}
 
-	r, err := git.PlainOpen(path)
+	r, err := git.PlainOpen(fullPath)
 	CheckIfError(err)
 
 	w, err := r.Worktree()
 	CheckIfError(err)
 
 	// Clean the repository
-	executeBashCommand("git reset --hard && git clean -d -f -q", path)
+	executeBashCommand("git reset --hard && git clean -d -f -q", fullPath)
 
 	if len(version) > 0 {
 		log.Println("version: " + version)
@@ -155,7 +138,7 @@ func (a *App) checkoutSourceCode(gitURL string, version string) string {
 		CheckIfError(err)
 	} else {
 		log.Println("No version specified, pulling and checking out main branch")
-		executeBashCommand("git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@' | xargs git checkout && git pull", path)
+		executeBashCommand("git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@' | xargs git checkout && git pull", fullPath)
 	}
 
 	return repoDir
@@ -253,13 +236,13 @@ func (a *App) moveBinaryToCorrectLocation(providerName string, version string, e
 }
 
 func (a *App) Install(providerName string, version string, customBuildCommand string) bool {
-	providerData := a.getProviderData(providerName)
+	providerData := getProviderData(providerName)
 	fmt.Fprintf(os.Stdout, "Repo: %s\n", providerData.Repo)
 
 	gitRepo := providerData.Repo
 	fmt.Fprintf(os.Stdout, "GitRepo: %s\n", gitRepo)
 
-	sourceCodeDir := a.checkoutSourceCode(gitRepo, version)
+	sourceCodeDir := checkoutSourceCode(a.Config.ProvidersCacheDir, gitRepo, version)
 	a.buildProvider(sourceCodeDir, providerName, version, customBuildCommand)
 
 	name := strings.Split(gitRepo, "/")[1]
