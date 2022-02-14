@@ -245,7 +245,7 @@ func (a *App) Install(providerName string, version string, customBuildCommand st
 	sourceCodeDir := checkoutSourceCode(a.Config.ProvidersCacheDir, gitRepo, version)
 	a.buildProvider(sourceCodeDir, providerName, version, customBuildCommand)
 
-	name := strings.Split(gitRepo, "/")[1]
+	name := extractRepoNameFromURL(gitRepo)
 	a.moveBinaryToCorrectLocation(providerName, version, name)
 
 	return true
