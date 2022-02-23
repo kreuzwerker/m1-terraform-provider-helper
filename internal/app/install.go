@@ -201,7 +201,7 @@ func (a *App) buildProvider(dir string, providerName string, version string, cus
 	var buildCommand string
 
 	if len(customBuildCommand) > 0 {
-		fmt.Fprintf(os.Stdout, "Using custom build command: \"%s\n\"", customBuildCommand)
+		fmt.Fprintf(os.Stdout, "Using custom build command: \"%s\"\n", customBuildCommand)
 		buildCommand = customBuildCommand
 	} else {
 		buildCommand = createBuildCommand(providerName, version, a.Config.GoPath)
@@ -224,6 +224,7 @@ func (a *App) moveBinaryToCorrectLocation(providerName string, version string, e
 		log.Fatal(err)
 	}
 
+	fmt.Fprintf(os.Stdout, "GOPATH: %s\n", a.Config.GoPath)
 	pathOfExecutable := a.Config.GoPath + "/bin/" + executableName
 	newPath := filePath + "/" + executableName + "_" + version + "_x5"
 
