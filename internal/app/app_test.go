@@ -152,7 +152,7 @@ func TestCheckStatus(t *testing.T) {
 	})
 }
 
-func TestListProviders( t *testing.T) {
+func TestListProviders(t *testing.T) {
 	t.Run("Should return no output for fresh install", func(t *testing.T) {
 		app, buf := setupTestAppInstance(t)
 		createDirIfNotExists(app.Config.TerraformPluginDir)
