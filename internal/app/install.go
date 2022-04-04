@@ -176,7 +176,7 @@ func createBuildCommand(providerName string, version string, goPath string) stri
 	buildCommands["default"] = []BuildCommandInformation{{command: "make build", startingVersion: 0}}
 	buildCommands["hashicorp/helm"] = []BuildCommandInformation{{command: "make build && cp terraform-provider-helm " + goPath + "/bin/" + "terraform-provider-helm", startingVersion: 0}}
 	buildCommands["hashicorp/aws"] = []BuildCommandInformation{
-		{command: "make tools && make fmt && gofmt -s -w ./tools.go && make build", startingVersion: 0},
+		{command: "go get -u golang.org/x/sys && make tools && make fmt && gofmt -s -w ./tools.go && make build", startingVersion: 0},
 		{command: "cd tools && go get -d github.com/pavius/impi/cmd/impi && cd .. && make tools && make build", startingVersion: three},
 	}
 
