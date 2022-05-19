@@ -1,4 +1,17 @@
+<a href="https://terraform.io">
+    <img src="https://raw.githubusercontent.com/kreuzwerker/m1-terraform-provider-helper/main/assets/terraform-logo.png" alt="Terraform logo" title="Terraform" align="right" height="100" />
+</a>
+<a href="https://kreuzwerker.de">
+    <img src="https://raw.githubusercontent.com/kreuzwerker/m1-terraform-provider-helper/main/assets/xw-logo.png" alt="Kreuzwerker logo" title="Kreuzwerker" align="right" height="100" />
+</a>
+
 # m1-terraform-provider-helper
+
+[![Release](https://img.shields.io/github/v/release/kreuzwerker/m1-terraform-provider-helper)](https://github.com/kreuzwerker/m1-terraform-provider-helper/releases)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/kreuzwerker/m1-terraform-provider-helper/blob/main/LICENSE)  
+[![Go Status](https://github.com/kreuzwerker/m1-terraform-provider-helper/workflows/tests/badge.svg)](https://github.com/kreuzwerker/m1-terraform-provider-helper/actions)
+[![Lint Status](https://github.com/kreuzwerker/m1-terraform-provider-helper/workflows/golangci-lint/badge.svg)](https://github.com/kreuzwerker/m1-terraform-provider-helper/actions)
+[![Go Report Card](https://goreportcard.com/badge/github.com/kreuzwerker/m1-terraform-provider-helper)](https://goreportcard.com/report/github.com/kreuzwerker/m1-terraform-provider-helper)  
 
 A CLI to help with managing the installation and compilation of terraform providers when running a new M1 Mac. 
 
