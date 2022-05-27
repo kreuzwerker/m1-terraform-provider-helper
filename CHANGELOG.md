@@ -1,4 +1,10 @@
 
+<a name="0.6.0"></a>
+## [0.6.0] - 2022-05-27
+### bug fixes
+- error when GOPATH not set ([46aeaeb](https://github.com/kreuzwerker/m1-terraform-provider-helper/commit/46aeaeb367a018d595896680d7350651f5eb5f88))
+
+
 <a name="0.5.1"></a>
 ## [0.5.1] - 2022-02-14
 
