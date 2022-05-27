@@ -54,4 +54,3 @@ jobs:
           ./dist/release/m1-terraform-provider-helper install hashicorp/github -v v3.0.0 --custom-build-command "go fmt ./... && make fmt && make build"
           ./dist/release/m1-terraform-provider-helper install hashicorp/random -v v3.1.0 --custom-build-command "gofmt -s -w tools && make build"
           ./dist/release/m1-terraform-provider-helper install mongodb/mongodbatlas -v v0.8.2 --custom-build-command "go fmt ./... && make build"
-          ./dist/release/m1-terraform-provider-helper install hashicorp/aws -v v1.3.0 --custom-build-command "go mod init && go mod vendor && make fmt && make build"
