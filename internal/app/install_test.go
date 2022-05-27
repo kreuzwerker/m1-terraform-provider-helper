@@ -2,6 +2,9 @@ package app
 
 import (
 	"testing"
+	"github.com/jarcoal/httpmock"
+	"time"
+	"strings"
 )
 
 func TestExtractVersionAsNumber(t *testing.T) {
@@ -65,4 +68,55 @@ func TestCloneRepo(t *testing.T) {
 	if !isDirExistent(fullPath) {
 		t.Fatalf("terraform-provider-random should be a dir inside %s", tmpDir)
 	}
+}
+
+func TestGetProviderData(t *testing.T) {	
+	repo := "https://github.com/hashicorp/terraform-provider-aws"
+	description := "terraform-provider-aws"
+
+	t.Run("Should get and parse JSON response", func(t *testing.T) {
+		provider := "hashicorp/aws"
+
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+		httpmock.RegisterResponder("GET", "https://registry.terraform.io/v1/providers/" + provider,
+    		httpmock.NewStringResponder(200, `{"description": "` + description + `",
+			"source": "` + repo +`"}`))
+		providerData, err := getProviderData(provider)
+		if err != nil {
+			t.Errorf("Should not have an error %s ", err)
+		}
+		if (providerData.Repo != repo) {
+			t.Errorf("expected %#v, but got %#v", repo, providerData.Repo)
+		}
+		if (providerData.Description != description) {
+			t.Errorf("expected %#v, but got %#v", description, providerData.Description)
+		}
+	})
+	t.Run("Should get request timeout error", func(t *testing.T) {
+		provider := "hashicorp/google"
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+		httpmock.RegisterResponder("GET", "https://registry.terraform.io/v1/providers/" + provider,
+    		httpmock.NewStringResponder(200, `{"description": "` + description + `",
+			"source": "` + repo +`"}`).Delay(3 * time.Second))
+		_, err := getProviderData(provider)
+		if !strings.HasPrefix(err.Error(), "timeout error") {
+			t.Errorf("Expected \"error timeout\" but got %#v", err.Error())
+		}
+		if err == nil {
+			t.Error("Should have an error")
+		}
+	})
+	t.Run("Should error with mismatched JSON", func(t *testing.T) {
+		provider := "hashicorp/vault"
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+		httpmock.RegisterResponder("GET", "https://registry.terraform.io/v1/providers/" + provider,
+    		httpmock.NewStringResponder(200, `{"test:"812}`))
+		_, err := getProviderData(provider)
+		if err == nil {
+			t.Error("Should run into JSON parse error")
+		}
+	})
 }
