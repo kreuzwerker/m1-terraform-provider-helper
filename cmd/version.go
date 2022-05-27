@@ -1,9 +1,10 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	"fmt"
 	"os"
+
+	"github.com/spf13/cobra"
 )
 
 const version string = "0.5.1"
