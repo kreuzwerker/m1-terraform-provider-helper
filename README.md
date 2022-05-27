@@ -40,6 +40,7 @@ Available Commands:
   install     Downloads (and compiles) a terraform provider for the M1 chip
   list        Lists all available providers and their versions
   status      Shows the status of the m1 provider installations
+  version     Display the current version
 
 Flags:
   -h, --help   help for m1-terraform-provider-helper
@@ -87,6 +88,8 @@ make build
 in the project's root directory. This will generate the executable `dist/m1-terraform-provider-helper` file that you can run.
 
 ### Release
+
+**IMPORTANT**: Before releasing any version, you have to manually edit the `cmd/version.go` file and change the `version` constant to the new version you'll release.
 
 If you want to generate the changelog and see it only (it will neither commit, tag nor push)
 run one of the following commands:

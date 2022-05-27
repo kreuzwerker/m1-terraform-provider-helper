@@ -16,6 +16,7 @@ func RootCmd() *cobra.Command {
 		deactivateCmd(),
 		installCmd(),
 		listCmd(),
+		versionCmd(),
 	)
 
 	return cmd
