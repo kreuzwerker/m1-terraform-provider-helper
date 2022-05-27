@@ -57,45 +57,42 @@ func executeBashCommand(command string, baseDir string) {
 	}
 }
 
-func getProviderData(providerName string) Provider {
+func getProviderData(providerName string) (Provider, error) {
 	url := "https://registry.terraform.io/v1/providers/" + providerName
 
-	ctx, cancel := context.WithCancel(context.Background())
-
-	go func() {
-		time.Sleep(time.Second * time.Duration(float64(requestTimeoutSeconds)))
-		println("Cancel")
-		cancel()
-	}()
-
-	client := http.Client{}
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	client := &http.Client{Timeout: time.Second * time.Duration(float64(requestTimeoutSeconds))}
+	ctx := context.Background()
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 
 	if err != nil {
-		panic(err.Error())
+		return Provider{}, fmt.Errorf("request error %w", err)
 	}
-	// #nosec G107
+
 	res, err := client.Do(req)
 
 	if err != nil {
-		panic(err.Error())
+		if os.IsTimeout(err) {
+			return Provider{}, fmt.Errorf("timeout error while trying to get provider data from "+url+": %w", err)
+		}
+
+		return Provider{}, fmt.Errorf("response error %w", err)
 	}
 
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
 
 	if err != nil {
-		panic(err.Error())
+		return Provider{}, fmt.Errorf("body reading error %w", err)
 	}
 
 	var data Provider
 
 	err = json.Unmarshal(body, &data)
 	if err != nil {
-		panic(err.Error())
+		return Provider{}, fmt.Errorf("could not parse JSON %w", err)
 	}
 
-	return data
+	return data, nil
 }
 
 func cloneRepo(gitURL string, fullPath string) {
@@ -239,7 +236,13 @@ func (a *App) moveBinaryToCorrectLocation(providerName string, version string, e
 }
 
 func (a *App) Install(providerName string, version string, customBuildCommand string) bool {
-	providerData := getProviderData(providerName)
+	providerData, err := getProviderData(providerName)
+
+	if err != nil {
+		fmt.Fprintf(os.Stdout, "Error while trying to get provider data from terraform registry: %v", err.Error())
+		os.Exit(1)
+	}
+
 	fmt.Fprintf(os.Stdout, "Repo: %s\n", providerData.Repo)
 
 	gitRepo := providerData.Repo
