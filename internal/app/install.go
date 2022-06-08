@@ -9,18 +9,15 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
+	goversion "github.com/hashicorp/go-version"
 )
 
 const requestTimeoutSeconds int = 2
-const three int = 3
-const four int = 4
 
 type Provider struct {
 	Repo        string `json:"source"`
@@ -29,7 +26,7 @@ type Provider struct {
 
 type BuildCommandInformation struct {
 	command         string
-	startingVersion int
+	startingVersion *goversion.Version
 }
 
 func CheckIfError(err error) {
@@ -149,15 +146,6 @@ func extractRepoNameFromURL(url string) string {
 	return parts[len(parts)-1]
 }
 
-func extractMajorVersionAsNumber(version string) int {
-	sampleRegexp := regexp.MustCompile(`\d`)
-
-	result := sampleRegexp.FindString(version)
-	number, _ := strconv.Atoi(result)
-
-	return number
-}
-
 func normalizeSemver(version string) string {
 	if strings.HasPrefix(version, "v") {
 		return version[1:]
@@ -167,16 +155,25 @@ func normalizeSemver(version string) string {
 }
 
 func createBuildCommand(providerName string, version string, goPath string) string {
-	majorVersionNumberAsInt := extractMajorVersionAsNumber(version)
+	parsedVersion, err := goversion.NewVersion(version)
+	CheckIfError((err))
+
+	v0, _ := goversion.NewVersion("0")
+	v1, _ := goversion.NewVersion("1")
+	v2, _ := goversion.NewVersion("2")
+	v3, _ := goversion.NewVersion("3")
+	v4, _ := goversion.NewVersion("4")
 
 	buildCommands := make(map[string][]BuildCommandInformation)
-	buildCommands["default"] = []BuildCommandInformation{{command: "make build", startingVersion: 0}}
-	buildCommands["hashicorp/helm"] = []BuildCommandInformation{{command: "make build && cp terraform-provider-helm " + goPath + "/bin/" + "terraform-provider-helm", startingVersion: 0}}
-	buildCommands["hashicorp/google"] = []BuildCommandInformation{{command: "gofmt -s -w ./tools.go  && make build", startingVersion: 0}}
+	buildCommands["default"] = []BuildCommandInformation{{command: "make build", startingVersion: v0}}
+	buildCommands["hashicorp/helm"] = []BuildCommandInformation{{command: "make build && cp terraform-provider-helm " + goPath + "/bin/" + "terraform-provider-helm", startingVersion: v0}}
+	buildCommands["hashicorp/google"] = []BuildCommandInformation{{command: "gofmt -s -w ./tools.go  && make build", startingVersion: v0}}
 	buildCommands["hashicorp/aws"] = []BuildCommandInformation{
-		{command: "make tools && make fmt && gofmt -s -w ./tools.go && make build", startingVersion: 0},
-		{command: "cd tools && go get -d github.com/pavius/impi/cmd/impi && cd .. && make tools && make build", startingVersion: three},
-		{command: "make tools && make build", startingVersion: four},
+		{command: "make tools && make fmt && gofmt -s -w ./tools.go && make build", startingVersion: v0},
+		{command: "go mod init && go mod vendor && make fmt && make build", startingVersion: v1},
+		{command: "make tools && make fmt && gofmt -s -w ./tools.go && make build", startingVersion: v2},
+		{command: "cd tools && go get -d github.com/pavius/impi/cmd/impi && cd .. && make tools && make build", startingVersion: v3},
+		{command: "make tools && make build", startingVersion: v4},
 	}
 
 	buildCommandMap, exists := buildCommands[providerName]
@@ -185,7 +182,7 @@ func createBuildCommand(providerName string, version string, goPath string) stri
 		var foundBuildCommand string
 
 		for _, v := range buildCommandMap {
-			if majorVersionNumberAsInt >= v.startingVersion {
+			if parsedVersion.GreaterThanOrEqual(v.startingVersion) {
 				foundBuildCommand = v.command
 			}
 		}
