@@ -8,17 +8,6 @@ import (
 	"github.com/jarcoal/httpmock"
 )
 
-func TestExtractVersionAsNumber(t *testing.T) {
-	var number int
-	number = extractMajorVersionAsNumber("v2.34.5")
-	if number != 2 {
-		t.Fatalf("number should be equal 2")
-	}
-	number = extractMajorVersionAsNumber("2.34.5")
-	if number != 2 {
-		t.Fatalf("number should be equal 2")
-	}
-}
 func TestCreateBuildCommand(t *testing.T) {
 	var buildCommand string
 	var expectedBuildCommand string

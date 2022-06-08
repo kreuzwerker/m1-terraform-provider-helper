@@ -9,8 +9,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -146,15 +144,6 @@ func extractRepoNameFromURL(url string) string {
 	parts := strings.Split(url, "/")
 
 	return parts[len(parts)-1]
-}
-
-func extractMajorVersionAsNumber(version string) int {
-	sampleRegexp := regexp.MustCompile(`\d`)
-
-	result := sampleRegexp.FindString(version)
-	number, _ := strconv.Atoi(result)
-
-	return number
 }
 
 func normalizeSemver(version string) string {
