@@ -1,10 +1,11 @@
 package app
 
 import (
-	"testing"
-	"github.com/jarcoal/httpmock"
-	"time"
 	"strings"
+	"testing"
+	"time"
+
+	"github.com/jarcoal/httpmock"
 )
 
 func TestExtractVersionAsNumber(t *testing.T) {
@@ -18,7 +19,6 @@ func TestExtractVersionAsNumber(t *testing.T) {
 		t.Fatalf("number should be equal 2")
 	}
 }
-
 func TestCreateBuildCommand(t *testing.T) {
 	var buildCommand string
 	var expectedBuildCommand string
@@ -70,7 +70,7 @@ func TestCloneRepo(t *testing.T) {
 	}
 }
 
-func TestGetProviderData(t *testing.T) {	
+func TestGetProviderData(t *testing.T) {
 	repo := "https://github.com/hashicorp/terraform-provider-aws"
 	description := "terraform-provider-aws"
 
@@ -79,17 +79,17 @@ func TestGetProviderData(t *testing.T) {
 
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
-		httpmock.RegisterResponder("GET", "https://registry.terraform.io/v1/providers/" + provider,
-    		httpmock.NewStringResponder(200, `{"description": "` + description + `",
-			"source": "` + repo +`"}`))
+		httpmock.RegisterResponder("GET", "https://registry.terraform.io/v1/providers/"+provider,
+			httpmock.NewStringResponder(200, `{"description": "`+description+`",
+			"source": "`+repo+`"}`))
 		providerData, err := getProviderData(provider)
 		if err != nil {
 			t.Errorf("Should not have an error %s ", err)
 		}
-		if (providerData.Repo != repo) {
+		if providerData.Repo != repo {
 			t.Errorf("expected %#v, but got %#v", repo, providerData.Repo)
 		}
-		if (providerData.Description != description) {
+		if providerData.Description != description {
 			t.Errorf("expected %#v, but got %#v", description, providerData.Description)
 		}
 	})
@@ -97,9 +97,9 @@ func TestGetProviderData(t *testing.T) {
 		provider := "hashicorp/google"
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
-		httpmock.RegisterResponder("GET", "https://registry.terraform.io/v1/providers/" + provider,
-    		httpmock.NewStringResponder(200, `{"description": "` + description + `",
-			"source": "` + repo +`"}`).Delay(3 * time.Second))
+		httpmock.RegisterResponder("GET", "https://registry.terraform.io/v1/providers/"+provider,
+			httpmock.NewStringResponder(200, `{"description": "`+description+`",
+			"source": "`+repo+`"}`).Delay(3*time.Second))
 		_, err := getProviderData(provider)
 		if !strings.HasPrefix(err.Error(), "timeout error") {
 			t.Errorf("Expected \"error timeout\" but got %#v", err.Error())
@@ -112,8 +112,8 @@ func TestGetProviderData(t *testing.T) {
 		provider := "hashicorp/vault"
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
-		httpmock.RegisterResponder("GET", "https://registry.terraform.io/v1/providers/" + provider,
-    		httpmock.NewStringResponder(200, `{"test:"812}`))
+		httpmock.RegisterResponder("GET", "https://registry.terraform.io/v1/providers/"+provider,
+			httpmock.NewStringResponder(200, `{"test:"812}`))
 		_, err := getProviderData(provider)
 		if err == nil {
 			t.Error("Should run into JSON parse error")
