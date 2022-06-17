@@ -25,7 +25,7 @@ jobs:
       - name: Run tests
         run: make test
       - name: Convert coverage
-        uses: jandelgado/gcov2lcov-action@v1.0.5
+        uses: jandelgado/gcov2lcov-action@v1.0.9
         with:
           infile: ./dist/test_results/main/coverage.out
           outfile: ./dist/test_results/main/coverage.lcov
