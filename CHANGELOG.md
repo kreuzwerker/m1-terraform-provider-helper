@@ -1,4 +1,10 @@
 
+<a name="0.6.1"></a>
+## [0.6.1] - 2022-06-21
+### features
+- introduce go-version for semver handling. ([7c7a263](https://github.com/kreuzwerker/m1-terraform-provider-helper/commit/7c7a263376edde733275c3c801dde1df2bd7c3ec))
+
+
 <a name="0.6.0"></a>
 ## [0.6.0] - 2022-05-27
 ### bug fixes
