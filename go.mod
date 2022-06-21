@@ -6,7 +6,7 @@ require (
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/hashicorp/go-version v1.5.0
 	github.com/jarcoal/httpmock v1.2.0
-	github.com/spf13/cobra v1.4.0
+	github.com/spf13/cobra v1.5.0
 )
 
 require (
