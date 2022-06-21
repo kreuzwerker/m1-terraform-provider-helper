@@ -124,6 +124,8 @@ func checkoutSourceCode(baseDir string, gitURL string, version string) string {
 
 	// Clean the repository
 	executeBashCommand("git reset --hard && git clean -d -f -q", fullPath)
+	log.Println("Pulling newest changes from " + gitURL)
+	executeBashCommand("git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@' | xargs git checkout && git pull", fullPath)
 
 	if len(version) > 0 {
 		log.Println("version: " + version)
@@ -133,8 +135,7 @@ func checkoutSourceCode(baseDir string, gitURL string, version string) string {
 		})
 		CheckIfError(err)
 	} else {
-		log.Println("No version specified, pulling and checking out main branch")
-		executeBashCommand("git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@' | xargs git checkout && git pull", fullPath)
+		log.Println("No version specified, staying on latest commit")
 	}
 
 	return repoDir
