@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -50,7 +51,12 @@ func executeBashCommand(command string, baseDir string) {
 	}
 
 	if err := cmd.Run(); err != nil {
-		log.Fatalf("Bash code did not run successfully: %s", err)
+		var e *exec.ExitError
+		if errors.As(err, &e) {
+			if e.ExitCode() != 0 {
+				log.Fatalf("Bash execution did not run successfully: %s", err)
+			}
+		}
 	}
 }
 
@@ -125,7 +131,7 @@ func checkoutSourceCode(baseDir string, gitURL string, version string) string {
 	// Clean the repository
 	executeBashCommand("git reset --hard && git clean -d -f -q", fullPath)
 	log.Println("Pulling newest changes from " + gitURL)
-	executeBashCommand("git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@' | xargs git checkout && git pull", fullPath)
+	executeBashCommand("git remote show origin | sed -n '/HEAD branch/s/.*: //p'| xargs git checkout && git pull", fullPath)
 
 	if len(version) > 0 {
 		log.Println("version: " + version)
