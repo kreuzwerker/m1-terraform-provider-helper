@@ -1,4 +1,11 @@
 
+<a name="0.6.2"></a>
+## [0.6.2] - 2022-06-22
+### bug fixes
+- Fix linting error. ([1aa7344](https://github.com/kreuzwerker/m1-terraform-provider-helper/commit/1aa73441d83aea882a059894ad40b19940e9ee73))
+- Improve command to checkout default branch ([bf729f8](https://github.com/kreuzwerker/m1-terraform-provider-helper/commit/bf729f8cfcbd9fd3ff3377cdf6e3a3337c760536))
+
+
 <a name="0.6.1"></a>
 ## [0.6.1] - 2022-06-21
 ### features
