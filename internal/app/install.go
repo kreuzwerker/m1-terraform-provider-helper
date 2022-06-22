@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -50,8 +51,9 @@ func executeBashCommand(command string, baseDir string) {
 	}
 
 	if err := cmd.Run(); err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok {
-			if exitError.ExitCode() != 0 {
+		var e *exec.ExitError
+		if errors.As(err, &e) {
+			if e.ExitCode() != 0 {
 				log.Fatalf("Bash execution did not run successfully: %s", err)
 			}
 		}
