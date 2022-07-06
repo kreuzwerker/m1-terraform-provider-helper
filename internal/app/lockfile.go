@@ -91,6 +91,7 @@ func writeFile(contents string, path string) {
 
 	if err != nil {
 		log.Println(err)
+
 		return
 	}
 
@@ -100,6 +101,7 @@ func writeFile(contents string, path string) {
 
 	if err2 != nil {
 		log.Println(err)
+
 		return
 	}
 }
