@@ -109,3 +109,15 @@ func TestGetProviderData(t *testing.T) {
 		}
 	})
 }
+
+func TestCheckoutSourceCode(t *testing.T) {
+	t.Run("Should checkout source code once", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		checkoutSourceCode(tmpDir+"/cliCache", "https://github.com/hashicorp/terraform-provider-random", "v2.2.0")
+	})
+	t.Run("Should checkout two versions of same source code once", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		checkoutSourceCode(tmpDir+"/cliCache", "https://github.com/hashicorp/terraform-provider-random", "v2.3.1")
+		checkoutSourceCode(tmpDir+"/cliCache", "https://github.com/hashicorp/terraform-provider-random", "v2.2.0")
+	})
+}
