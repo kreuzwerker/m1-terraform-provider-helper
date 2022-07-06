@@ -26,6 +26,7 @@ const (
 	DefaultProvidersCacheDir        = "/.m1-terraform-provider-helper"
 	DefaultTerraformPluginDir       = "/.terraform.d/plugins"
 	DefaultTerraformPluginBackupDir = "/.terraform.d/plugins_backup"
+	FileModePerm                    = 0777
 )
 
 func New() *App {
@@ -54,7 +55,7 @@ func (a *App) Init() {
 
 func createDirIfNotExists(dir string) {
 	if !isDirExistent(dir) {
-		err := os.MkdirAll(dir, 0777)
+		err := os.MkdirAll(dir, FileModePerm)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -125,8 +126,8 @@ func visit(providerVersions map[string][]string) filepath.WalkFunc {
 
 			if exists {
 				// add version to existing entry
-				newEntry := append(entry, version)
-				providerVersions[providerName] = newEntry
+				entry := append(entry, version)
+				providerVersions[providerName] = entry
 			} else {
 				// make new entry
 				newEntry := []string{version}

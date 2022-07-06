@@ -221,18 +221,14 @@ func (a *App) moveBinaryToCorrectLocation(providerName string, version string, e
 	}
 
 	filePath := a.Config.TerraformPluginDir + "/registry.terraform.io/" + providerName + "/" + version + "/darwin_arm64"
-	err := os.MkdirAll(filePath, 0777)
-
-	if err != nil {
-		log.Fatal(err)
-	}
+	createDirIfNotExists(filePath)
 
 	fmt.Fprintf(os.Stdout, "GOPATH: %s\n", a.Config.GoPath)
 	pathOfExecutable := a.Config.GoPath + "/bin/" + executableName
 	newPath := filePath + "/" + executableName + "_" + version + "_x5"
 
 	log.Print("Move from " + pathOfExecutable + " to " + newPath)
-	err = os.Rename(pathOfExecutable, newPath)
+	err := os.Rename(pathOfExecutable, newPath)
 
 	if err != nil {
 		log.Fatal(err)
