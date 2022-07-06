@@ -15,3 +15,5 @@ linters:
     - funlen
     - exhaustivestruct
     - goerr113 # will be addressed later
+    - varnamelen
+    - exhaustruct
