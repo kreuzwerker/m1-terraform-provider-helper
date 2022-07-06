@@ -23,7 +23,7 @@ type Lockfile struct {
 type ProviderConfig struct {
 	Name        string   `hcl:"name,label"`
 	Version     string   `hcl:"version"`
-	Constraints string   `hcl:"constraints"`
+	Constraints string   `hcl:"constraints,omitempty"`
 	Hashes      []string `hcl:"hashes"`
 }
 
@@ -114,7 +114,10 @@ func createHclBody(hcl Lockfile) string {
 		barBlock := rootBody.AppendNewBlock("provider", []string{v.Name})
 		barBody := barBlock.Body()
 		barBody.SetAttributeValue("version", cty.StringVal(v.Version))
-		barBody.SetAttributeValue("constraints", cty.StringVal(v.Constraints))
+
+		if v.Constraints != "" {
+			barBody.SetAttributeValue("constraints", cty.StringVal(v.Constraints))
+		}
 
 		var listOfHashes []cty.Value
 		for _, hash := range v.Hashes {

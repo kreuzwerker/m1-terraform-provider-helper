@@ -54,6 +54,22 @@ provider "test" {
 			t.Fatalf("expected %#v, but got %#v", stringToCompare, fileContents)
 		}
 	})
+	t.Run("Should create body with no constraints", func(t *testing.T) {
+		lockfile := &Lockfile{
+			Provider: []ProviderConfig{{Name: "test", Version: "1.0.0", Hashes: []string{"h1:test"}}},
+		}
+		fileContents := createHclBody(*lockfile)
+
+		stringToCompare := `provider "test" {
+  version = "1.0.0"
+  hashes  = ["h1:test"]
+}
+`
+
+		if stringToCompare != fileContents {
+			t.Fatalf("expected %#v, but got %#v", stringToCompare, fileContents)
+		}
+	})
 }
 
 func TestParseOutputLockfilePath(t *testing.T) {
