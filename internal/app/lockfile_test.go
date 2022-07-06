@@ -15,9 +15,10 @@ func createFileInDir(dir string, fileName string) {
 }
 
 func TestCreateHclBody(t *testing.T) {
+	versionString := "1.0.0"
 	t.Run("Should create body with one entry", func(t *testing.T) {
 		lockfile := &Lockfile{
-			Provider: []ProviderConfig{{Name: "test", Version: "1.0.0", Constraints: "1.0.0", Hashes: []string{"h1:test", "h1:test1"}}},
+			Provider: []ProviderConfig{{Name: "test", Version: "1.0.0", Constraints: &versionString, Hashes: []string{"h1:test", "h1:test1"}}},
 		}
 		fileContents := createHclBody(*lockfile)
 
@@ -34,7 +35,7 @@ func TestCreateHclBody(t *testing.T) {
 	})
 	t.Run("Should create body with two entries", func(t *testing.T) {
 		lockfile := &Lockfile{
-			Provider: []ProviderConfig{{Name: "test", Version: "1.0.0", Constraints: "1.0.0", Hashes: []string{"h1:test"}}, {Name: "test", Version: "1.0.0", Constraints: "1.0.0", Hashes: []string{"h1:test"}}},
+			Provider: []ProviderConfig{{Name: "test", Version: "1.0.0", Constraints: &versionString, Hashes: []string{"h1:test"}}, {Name: "test", Version: "1.0.0", Constraints: &versionString, Hashes: []string{"h1:test"}}},
 		}
 		fileContents := createHclBody(*lockfile)
 
@@ -109,5 +110,14 @@ func TestGetLockfile(t *testing.T) {
 		if expectedPath != actualPath {
 			t.Fatalf("expected %#v, but got %#v", expectedPath, actualPath)
 		}
+	})
+}
+
+func TestParseHclLockfile(t *testing.T) {
+	t.Run("Should parse lockfile with no constraints field", func(t *testing.T) {
+		parseHclLockfile("../../testdata/lockfile_no_constraints.hcl")
+	})
+	t.Run("Should parse lockfile with all fields", func(t *testing.T) {
+		parseHclLockfile("../../testdata/lockfile.hcl")
 	})
 }

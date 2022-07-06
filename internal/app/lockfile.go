@@ -23,7 +23,7 @@ type Lockfile struct {
 type ProviderConfig struct {
 	Name        string   `hcl:"name,label"`
 	Version     string   `hcl:"version"`
-	Constraints string   `hcl:"constraints,omitempty"`
+	Constraints *string  `hcl:"constraints"`
 	Hashes      []string `hcl:"hashes"`
 }
 
@@ -44,13 +44,7 @@ func (a *App) UpgradeLockfile(inputLockfilePath string, outputLockfilePath strin
 	log.Printf("Lockfile path: %s", verifiedLockfilePath)
 	log.Printf("Output path: %s", verifiedOutputPath)
 
-	// parse lockfile
-	var config Lockfile
-	err := hclsimple.DecodeFile(verifiedLockfilePath, nil, &config)
-
-	if err != nil {
-		log.Fatalf("Failed to load configuration: %s", err)
-	}
+	config := parseHclLockfile(verifiedLockfilePath)
 
 	for i, v := range config.Provider {
 		filePath := a.Config.TerraformPluginDir + "/" + v.Name + "/" + v.Version + "/darwin_arm64"
@@ -66,6 +60,17 @@ func (a *App) UpgradeLockfile(inputLockfilePath string, outputLockfilePath strin
 
 	newContents := createHclBody(config)
 	writeFile(newContents, verifiedOutputPath)
+}
+
+func parseHclLockfile(filepath string) Lockfile {
+	var config Lockfile
+	err := hclsimple.DecodeFile(filepath, nil, &config)
+
+	if err != nil {
+		log.Fatalf("Failed to load configuration: %s", err)
+	}
+
+	return config
 }
 
 // check if lockFilePath exists
@@ -115,8 +120,8 @@ func createHclBody(hcl Lockfile) string {
 		barBody := barBlock.Body()
 		barBody.SetAttributeValue("version", cty.StringVal(v.Version))
 
-		if v.Constraints != "" {
-			barBody.SetAttributeValue("constraints", cty.StringVal(v.Constraints))
+		if v.Constraints != nil && *v.Constraints != "" {
+			barBody.SetAttributeValue("constraints", cty.StringVal(*v.Constraints))
 		}
 
 		var listOfHashes []cty.Value
