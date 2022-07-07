@@ -131,9 +131,10 @@ func createHclBody(hcl Lockfile) string {
 		barBody.SetAttributeValue("hashes", list)
 	}
 
-	strToConvert := bytes.NewBuffer(f.Bytes()).String()
+	convertedString := bytes.NewBuffer(f.Bytes()).String()
+	fullString := "# This file is maintained automatically by \"terraform init\".\n# Manual edits may be lost in future updates.\n\n" + convertedString
 
-	return strToConvert
+	return fullString
 }
 
 func getCalculatedHashForProvider(fullPath string) string {

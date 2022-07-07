@@ -22,7 +22,10 @@ func TestCreateHclBody(t *testing.T) {
 		}
 		fileContents := createHclBody(*lockfile)
 
-		stringToCompare := `provider "test" {
+		stringToCompare := `# This file is maintained automatically by "terraform init".
+# Manual edits may be lost in future updates.
+
+provider "test" {
   version     = "1.0.0"
   constraints = "1.0.0"
   hashes      = ["h1:test", "h1:test1"]
@@ -39,7 +42,10 @@ func TestCreateHclBody(t *testing.T) {
 		}
 		fileContents := createHclBody(*lockfile)
 
-		stringToCompare := `provider "test" {
+		stringToCompare := `# This file is maintained automatically by "terraform init".
+# Manual edits may be lost in future updates.
+
+provider "test" {
   version     = "1.0.0"
   constraints = "1.0.0"
   hashes      = ["h1:test"]
@@ -61,7 +67,10 @@ provider "test" {
 		}
 		fileContents := createHclBody(*lockfile)
 
-		stringToCompare := `provider "test" {
+		stringToCompare := `# This file is maintained automatically by "terraform init".
+# Manual edits may be lost in future updates.
+
+provider "test" {
   version = "1.0.0"
   hashes  = ["h1:test"]
 }
