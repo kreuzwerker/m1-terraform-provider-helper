@@ -14,6 +14,7 @@ func RootCmd() *cobra.Command {
 		statusCmd(),
 		activateCmd(),
 		deactivateCmd(),
+		lockfileCmd(),
 		installCmd(),
 		listCmd(),
 		versionCmd(),
