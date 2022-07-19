@@ -28,6 +28,7 @@ endif
 GOTESTSUM_VERSION = 1.8.1
 GOLANGCI_VERSION = 1.46.2
 GITCHGLOG_VERSION = 0.15.1
+SVU_VERSION = 1.9.0
 
 GOLANG_VERSION = 1.18
 
@@ -116,6 +117,12 @@ lint-ci: bin/golangci-lint ## Run linter with output to file with checkstyle for
 	@mkdir -p ${BUILD_DIR}/lint_results
 	bin/golangci-lint run --out-format checkstyle > ${BUILD_DIR}/lint_results/golangci-lint.out
 
+bin/svu: bin/svu-${SVU_VERSION}
+	@ln -sf svu-${SVU_VERSION} bin/svu
+bin/svu-${SVU_VERSION}:
+	@mkdir -p bin
+	curl -L https://github.com/caarlos0/svu/releases/download/v${SVU_VERSION}/svu_${SVU_VERSION}_${GOOS}_${GOARCH}.tar.gz | tar -zOxf - svu > ./bin/svu-${SVU_VERSION} && chmod +x ./bin/svu-${SVU_VERSION}
+
 bin/git-chglog: bin/git-chglog-${GITCHGLOG_VERSION}
 	@ln -sf git-chglog-${GITCHGLOG_VERSION} bin/git-chglog
 bin/git-chglog-${GITCHGLOG_VERSION}:
@@ -142,7 +149,7 @@ ifneq (${PUSH}, 1)
 	@echo "Review the changes made by this script then execute the following:"
 ifneq (${TAG}, 1)
 	@echo
-	@echo "git add CHANGELOG.md && git commit -m 'Prepare release $*' && git tag -m 'Release $*' ${TAG_PREFIX}$*"
+	@echo "git add CHANGELOG.md cmd/version.go && git commit -m 'Prepare release $*' && git tag -m 'Release $*' ${TAG_PREFIX}$*"
 	@echo
 	@echo "Finally, push the changes:"
 endif
@@ -152,15 +159,22 @@ endif
 
 .PHONY: patch
 patch: ## Release a new patch version
-	@${MAKE} release-$(shell (git describe --abbrev=0 --tags 2> /dev/null || echo "0.0.0") | sed 's/^v//' | awk -F'[ .]' '{print $$1"."$$2"."$$3+1}')
+	@${MAKE} replace-occurences-$(shell (svu --strip-prefix patch))
+	@${MAKE} release-$(shell (svu --strip-prefix patch))
 
 .PHONY: minor
 minor: ## Release a new minor version
-	@${MAKE} release-$(shell (git describe --abbrev=0 --tags 2> /dev/null || echo "0.0.0") | sed 's/^v//' | awk -F'[ .]' '{print $$1"."$$2+1".0"}')
+	@${MAKE} replace-occurences-$(shell (svu --strip-prefix minor))
+	@${MAKE} release-$(shell (svu --strip-prefix minor))
 
 .PHONY: major
 major: ## Release a new major version
-	@${MAKE} release-$(shell (git describe --abbrev=0 --tags 2> /dev/null || echo "0.0.0") | sed 's/^v//' | awk -F'[ .]' '{print $$1+1".0.0"}')
+	@${MAKE} replace-occurences-$(shell (svu --strip-prefix major))
+	@${MAKE} release-$(shell (svu --strip-prefix major))
+
+replace-occurences-%:
+	@echo "Replace occurences of old version strings..."
+	sed -i '' "s/$(shell (svu --strip-prefix current))/$*/g" cmd/version.go
 
 .PHONY: list
 list: ## List all make targets
