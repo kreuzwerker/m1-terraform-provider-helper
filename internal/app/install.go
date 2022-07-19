@@ -260,7 +260,7 @@ func (a *App) moveBinaryToCorrectLocation(providerName string, version string, e
 }
 
 func (a *App) createDestinationAndReturnExecutablePath(providerName string, version string, executableName string) string {
-	oldTfVersion, _ := goversion.NewVersion("1.2.0")
+	oldTfVersion, _ := goversion.NewVersion("0.12.31")
 	currentTfVersion := getTerraformVersion()
 
 	var newPath string
