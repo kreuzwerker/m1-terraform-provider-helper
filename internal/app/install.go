@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 	"time"
 
@@ -285,13 +286,12 @@ func (a *App) createDestinationAndReturnExecutablePath(providerName string, vers
 }
 
 func getTerraformVersion() *goversion.Version {
-	versionRaw := executeBashCommandAndReturnOutput("terraform version -json", "./")
+	versionRaw := executeBashCommandAndReturnOutput("terraform version", "./")
+	re := regexp.MustCompile(`Terraform v([\d.]*)`)
 
-	var versionObj TerraformVersion
+	find := re.FindStringSubmatch(versionRaw) // returns object of []string{"Terraform v1.1.2", "1.1.2"}
 
-	err := json.Unmarshal([]byte(versionRaw), &versionObj)
-	CheckIfError(err)
-	parsedVersion, err := goversion.NewVersion(versionObj.Version)
+	parsedVersion, err := goversion.NewVersion(find[1])
 	CheckIfError(err)
 
 	return parsedVersion
