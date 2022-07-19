@@ -1,4 +1,10 @@
 
+<a name="0.7.2"></a>
+## [0.7.2] - 2022-07-19
+### bug fixes
+- Use raw `terraform version` for backwards compatibility. ([#76](https://github.com/kreuzwerker/m1-terraform-provider-helper/issues/76)) ([8ef73e7](https://github.com/kreuzwerker/m1-terraform-provider-helper/commit/8ef73e73adb2a26bc252fcf914ce2b0e867d7474))
+
+
 <a name="0.7.1"></a>
 ## [0.7.1] - 2022-07-19
 ### bug fixes
