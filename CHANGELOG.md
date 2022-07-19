@@ -1,4 +1,10 @@
 
+<a name="0.7.1"></a>
+## [0.7.1] - 2022-07-19
+### bug fixes
+- Correct plugin installation path for older tf versions. ([#74](https://github.com/kreuzwerker/m1-terraform-provider-helper/issues/74)) ([be46959](https://github.com/kreuzwerker/m1-terraform-provider-helper/commit/be469594a2156e99395f821d0a0cc46ced903840))
+
+
 <a name="0.7.0"></a>
 ## [0.7.0] - 2022-07-07
 
