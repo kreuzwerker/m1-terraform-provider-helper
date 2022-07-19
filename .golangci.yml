@@ -17,3 +17,4 @@ linters:
     - goerr113 # will be addressed later
     - varnamelen
     - exhaustruct
+    - tagliatelle

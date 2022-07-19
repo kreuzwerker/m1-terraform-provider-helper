@@ -64,7 +64,6 @@ func executeBashCommand(command string, baseDir string) {
 	}
 }
 
-// TODO: should consolidate the two executeBashCommand functions
 func executeBashCommandAndReturnOutput(command string, baseDir string) string {
 	shExecutable, _ := exec.LookPath("sh")
 
@@ -75,6 +74,7 @@ func executeBashCommandAndReturnOutput(command string, baseDir string) string {
 		Stderr: os.Stderr,
 		Dir:    baseDir,
 	}
+
 	output, err := cmd.Output()
 	if err != nil {
 		var e *exec.ExitError
@@ -84,6 +84,7 @@ func executeBashCommandAndReturnOutput(command string, baseDir string) string {
 			}
 		}
 	}
+
 	return string(output)
 }
 
@@ -263,11 +264,13 @@ func (a *App) createDestinationAndReturnExecutablePath(providerName string, vers
 	currentTfVersion := getTerraformVersion()
 
 	var newPath string
+
 	if currentTfVersion.GreaterThan(oldTfVersion) {
 		filePath := a.Config.TerraformPluginDir + "/registry.terraform.io/" + providerName + "/" + version + "/darwin_arm64"
 		createDirIfNotExists(filePath)
 
 		fmt.Fprintf(os.Stdout, "GOPATH: %s\n", a.Config.GoPath)
+
 		newPath = filePath + "/" + executableName + "_" + version + "_x5"
 	} else {
 		// before 0.12.31 it is: ~/.terraform.d/plugins/darwin_arm64/terraform-provider-template_v2.2.0
@@ -283,11 +286,14 @@ func (a *App) createDestinationAndReturnExecutablePath(providerName string, vers
 
 func getTerraformVersion() *goversion.Version {
 	versionRaw := executeBashCommandAndReturnOutput("terraform version -json", "./")
+
 	var versionObj TerraformVersion
+
 	err := json.Unmarshal([]byte(versionRaw), &versionObj)
 	CheckIfError(err)
 	parsedVersion, err := goversion.NewVersion(versionObj.Version)
 	CheckIfError(err)
+
 	return parsedVersion
 }
 
