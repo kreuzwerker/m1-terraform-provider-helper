@@ -17,6 +17,7 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	goversion "github.com/hashicorp/go-version"
+	"github.com/sirupsen/logrus"
 )
 
 const requestTimeoutSeconds int = 2
@@ -44,35 +45,14 @@ func CheckIfError(err error) {
 	os.Exit(1)
 }
 
-func executeBashCommand(command string, baseDir string) {
-	shExecutable, _ := exec.LookPath("sh")
-
-	cmd := &exec.Cmd{
-		Path:   shExecutable,
-		Args:   []string{shExecutable, "-c", command},
-		Stdout: os.Stdout,
-		Stderr: os.Stderr,
-		Dir:    baseDir,
-	}
-
-	if err := cmd.Run(); err != nil {
-		var e *exec.ExitError
-		if errors.As(err, &e) {
-			if e.ExitCode() != 0 {
-				log.Fatalf("Bash execution did not run successfully: %s", err)
-			}
-		}
-	}
-}
-
-func executeBashCommandAndReturnOutput(command string, baseDir string) string {
+func executeBashCommand(command string, baseDir string) string {
 	shExecutable, _ := exec.LookPath("sh")
 
 	cmd := &exec.Cmd{
 		Path:   shExecutable,
 		Args:   []string{shExecutable, "-c", command},
 		Stdout: nil,
-		Stderr: os.Stderr,
+		Stderr: nil,
 		Dir:    baseDir,
 	}
 
@@ -81,10 +61,12 @@ func executeBashCommandAndReturnOutput(command string, baseDir string) string {
 		var e *exec.ExitError
 		if errors.As(err, &e) {
 			if e.ExitCode() != 0 {
-				log.Fatalf("Bash execution did not run successfully: %s", err)
+				logrus.Fatalf("Bash execution did not run successfully: %s", err)
 			}
 		}
 	}
+
+	logrus.Infof("Bash execution output: %s", string(output))
 
 	return string(output)
 }
@@ -148,6 +130,7 @@ func checkoutSourceCode(baseDir string, gitURL string, version string) string {
 	fullPath := baseDir + "/" + repoDir
 
 	if !isDirExistent(fullPath) {
+		logrus.Infof("Cloning %s to %s", gitURL, fullPath)
 		cloneRepo(gitURL, fullPath)
 	}
 
@@ -158,19 +141,19 @@ func checkoutSourceCode(baseDir string, gitURL string, version string) string {
 	CheckIfError(err)
 
 	// Clean the repository
+	logrus.Infof("Resetting %s and pulling latest changes", fullPath)
 	executeBashCommand("git reset --hard && git clean -d -f -q", fullPath)
-	log.Println("Pulling newest changes from " + gitURL)
 	executeBashCommand("git remote show origin | sed -n '/HEAD branch/s/.*: //p'| xargs git checkout && git pull", fullPath)
 
 	if len(version) > 0 {
-		log.Println("version: " + version)
+		logrus.Infof("Checking out %s", version)
 		ref, _ := r.ResolveRevision(plumbing.Revision(version))
 		err = w.Checkout(&git.CheckoutOptions{
 			Hash: *ref,
 		})
 		CheckIfError(err)
 	} else {
-		log.Println("No version specified, staying on latest commit")
+		logrus.Info("No version specified, staying on latest commit")
 	}
 
 	return repoDir
@@ -232,12 +215,16 @@ func createBuildCommand(providerName string, version string, goPath string) stri
 func (a *App) buildProvider(dir string, providerName string, version string, customBuildCommand string) {
 	var buildCommand string
 
+	fmt.Fprintf(a.Out, "Compiling...\n")
+
 	if len(customBuildCommand) > 0 {
-		fmt.Fprintf(os.Stdout, "Using custom build command: \"%s\"\n", customBuildCommand)
 		buildCommand = customBuildCommand
 	} else {
 		buildCommand = createBuildCommand(providerName, version, a.Config.GoPath)
 	}
+
+	logrus.Infof("Using build command: %s", buildCommand)
+
 	// #nosec G204
 	executeBashCommand(buildCommand, a.Config.ProvidersCacheDir+"/"+dir)
 }
@@ -252,7 +239,7 @@ func (a *App) moveBinaryToCorrectLocation(providerName string, version string, e
 	newPath := a.createDestinationAndReturnExecutablePath(providerName, version, executableName)
 
 	pathOfExecutable := a.Config.GoPath + "/bin/" + executableName
-	log.Print("Move from " + pathOfExecutable + " to " + newPath)
+	logrus.Info("Move from " + pathOfExecutable + " to " + newPath)
 	err := os.Rename(pathOfExecutable, newPath)
 
 	if err != nil {
@@ -263,6 +250,7 @@ func (a *App) moveBinaryToCorrectLocation(providerName string, version string, e
 func (a *App) createDestinationAndReturnExecutablePath(providerName string, version string, executableName string) string {
 	oldTfVersion, _ := goversion.NewVersion("0.12.31")
 	currentTfVersion := getTerraformVersion()
+	logrus.Infof("Installed Terraform version: %s", currentTfVersion)
 
 	var newPath string
 
@@ -270,15 +258,11 @@ func (a *App) createDestinationAndReturnExecutablePath(providerName string, vers
 		filePath := a.Config.TerraformPluginDir + "/registry.terraform.io/" + providerName + "/" + version + "/darwin_arm64"
 		createDirIfNotExists(filePath)
 
-		fmt.Fprintf(os.Stdout, "GOPATH: %s\n", a.Config.GoPath)
-
 		newPath = filePath + "/" + executableName + "_" + version + "_x5"
 	} else {
 		// before 0.12.31 it is: ~/.terraform.d/plugins/darwin_arm64/terraform-provider-template_v2.2.0
 		filePath := a.Config.TerraformPluginDir + "/darwin_arm64"
 		createDirIfNotExists(filePath)
-
-		fmt.Fprintf(os.Stdout, "GOPATH: %s\n", a.Config.GoPath)
 		newPath = filePath + "/" + executableName + "_v" + version
 	}
 
@@ -286,7 +270,7 @@ func (a *App) createDestinationAndReturnExecutablePath(providerName string, vers
 }
 
 func getTerraformVersion() *goversion.Version {
-	versionRaw := executeBashCommandAndReturnOutput("terraform version", "./")
+	versionRaw := executeBashCommand("terraform version", "./")
 	re := regexp.MustCompile(`Terraform v([\d.]*)`)
 
 	find := re.FindStringSubmatch(versionRaw) // returns object of []string{"Terraform v1.1.2", "1.1.2"}
@@ -298,23 +282,25 @@ func getTerraformVersion() *goversion.Version {
 }
 
 func (a *App) Install(providerName string, version string, customBuildCommand string) bool {
+	fmt.Fprintf(a.Out, "Getting provider data from terraform registry\n")
+
 	providerData, err := getProviderData(providerName)
 
 	if err != nil {
-		fmt.Fprintf(os.Stdout, "Error while trying to get provider data from terraform registry: %v", err.Error())
-		os.Exit(1)
+		logrus.Fatalf("Error while trying to get provider data from terraform registry: %v", err.Error())
 	}
 
-	fmt.Fprintf(os.Stdout, "Repo: %s\n", providerData.Repo)
+	logrus.Infof("Provider data: %v", providerData)
 
 	gitRepo := providerData.Repo
-	fmt.Fprintf(os.Stdout, "GitRepo: %s\n", gitRepo)
 
+	fmt.Fprintf(a.Out, "Getting source code...\n")
 	sourceCodeDir := checkoutSourceCode(a.Config.ProvidersCacheDir, gitRepo, version)
 	a.buildProvider(sourceCodeDir, providerName, version, customBuildCommand)
 
 	name := extractRepoNameFromURL(gitRepo)
 	a.moveBinaryToCorrectLocation(providerName, version, name)
+	fmt.Fprintf(a.Out, "Successfully installed %s %s\n", providerName, version)
 
 	return true
 }

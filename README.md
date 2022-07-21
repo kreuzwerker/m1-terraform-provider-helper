@@ -24,6 +24,7 @@ A CLI to help with managing the installation and compilation of terraform provid
   - [Usage](#usage)
     - [Terraform Lockfile handling](#terraform-lockfile-handling)
     - [Providing custom build commands](#providing-custom-build-commands)
+    - [Logging](#logging)
   - [Development](#development)
     - [Testing](#testing)
     - [Build](#build)
@@ -99,6 +100,9 @@ The `install` commands relies on an internal `buildCommands` map to find the cor
 
 Please refer to the documentation of the provider to find out the build command.
 
+### Logging
+
+You can enable additional log output by setting the `TF_HELPER_LOG` environment variable to `info` or `debug` log level.
 
 ## Development
 
