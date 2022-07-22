@@ -121,3 +121,19 @@ func TestCheckoutSourceCode(t *testing.T) {
 		checkoutSourceCode(tmpDir+"/cliCache", "https://github.com/hashicorp/terraform-provider-random", "v2.2.0")
 	})
 }
+
+func TestParseBuildOutputAndGetBinaryOutputPath(t *testing.T) {
+	t.Run("Should parse correct output from go build -o command", func(t *testing.T) {
+		expected := "build/darwin_arm64/terraform-provider-pingdom_v1.1.3"
+		actual, ok := parseBuildOutputAndGetBinaryOutputPath("go build -o build/darwin_arm64/terraform-provider-pingdom_v1.1.3 ")
+		if ok && expected != actual {
+			t.Fatalf("expected %#v, but got %#v", expected, actual)
+		}
+	})
+	t.Run("Should parse correct output from go install command", func(t *testing.T) {
+		_, ok := parseBuildOutputAndGetBinaryOutputPath("go install")
+		if ok {
+			t.Fatalf("expected ok to be false")
+		}
+	})
+}

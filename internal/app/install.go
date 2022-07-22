@@ -212,7 +212,7 @@ func createBuildCommand(providerName string, version string, goPath string) stri
 	return buildCommands["default"][0].command
 }
 
-func (a *App) buildProvider(dir string, providerName string, version string, customBuildCommand string) {
+func (a *App) buildProvider(buildDir string, providerName string, version string, customBuildCommand string) string {
 	var buildCommand string
 
 	fmt.Fprintf(a.Out, "Compiling...\n")
@@ -226,10 +226,12 @@ func (a *App) buildProvider(dir string, providerName string, version string, cus
 	logrus.Infof("Using build command: %s", buildCommand)
 
 	// #nosec G204
-	executeBashCommand(buildCommand, a.Config.ProvidersCacheDir+"/"+dir)
+	buildOutput := executeBashCommand(buildCommand, buildDir)
+
+	return buildOutput
 }
 
-func (a *App) moveBinaryToCorrectLocation(providerName string, version string, executableName string) {
+func (a *App) moveBinaryToCorrectLocation(providerName string, version string, executableName string, buildOutput string, buildDir string) {
 	if len(version) == 0 {
 		version = "master"
 	} else {
@@ -239,12 +241,33 @@ func (a *App) moveBinaryToCorrectLocation(providerName string, version string, e
 	newPath := a.createDestinationAndReturnExecutablePath(providerName, version, executableName)
 
 	pathOfExecutable := a.Config.GoPath + "/bin/" + executableName
+
+	customPath, hasCustomPath := parseBuildOutputAndGetBinaryOutputPath(buildOutput)
+	if hasCustomPath {
+		pathOfExecutable = buildDir + "/" + customPath
+	}
+
 	logrus.Info("Move from " + pathOfExecutable + " to " + newPath)
 	err := os.Rename(pathOfExecutable, newPath)
 
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func parseBuildOutputAndGetBinaryOutputPath(buildOutput string) (string, bool) {
+	re := regexp.MustCompile(`go build.*?-o ([a-zA-Z\/\.\d_-]*)`)
+	find := re.FindStringSubmatch(buildOutput)
+
+	if len(find) == 0 {
+		logrus.Info("No custom build path found")
+
+		return "", false
+	}
+
+	logrus.Infof("Found custom build path: %s", find[1])
+
+	return find[1], true
 }
 
 func (a *App) createDestinationAndReturnExecutablePath(providerName string, version string, executableName string) string {
@@ -296,10 +319,11 @@ func (a *App) Install(providerName string, version string, customBuildCommand st
 
 	fmt.Fprintf(a.Out, "Getting source code...\n")
 	sourceCodeDir := checkoutSourceCode(a.Config.ProvidersCacheDir, gitRepo, version)
-	a.buildProvider(sourceCodeDir, providerName, version, customBuildCommand)
+	buildDir := a.Config.ProvidersCacheDir + "/" + sourceCodeDir
+	buildOutput := a.buildProvider(buildDir, providerName, version, customBuildCommand)
 
 	name := extractRepoNameFromURL(gitRepo)
-	a.moveBinaryToCorrectLocation(providerName, version, name)
+	a.moveBinaryToCorrectLocation(providerName, version, name, buildOutput, buildDir)
 	fmt.Fprintf(a.Out, "Successfully installed %s %s\n", providerName, version)
 
 	return true
