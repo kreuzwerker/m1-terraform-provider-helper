@@ -1,4 +1,10 @@
 
+<a name="0.7.4"></a>
+## [0.7.4] - 2022-07-22
+### features
+- Implement parsing of provider build output. ([#82](https://github.com/kreuzwerker/m1-terraform-provider-helper/issues/82)) ([ac1b248](https://github.com/kreuzwerker/m1-terraform-provider-helper/commit/ac1b248afb240726a3e6535973a934161a808f40))
+
+
 <a name="0.7.3"></a>
 ## [0.7.3] - 2022-07-21
 
