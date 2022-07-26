@@ -61,7 +61,7 @@ func executeBashCommand(command string, baseDir string) string {
 		var e *exec.ExitError
 		if errors.As(err, &e) {
 			if e.ExitCode() != 0 {
-				logrus.Fatalf("Bash execution did not run successfully: %s", err)
+				logrus.Fatalf("Bash execution did not run successfully: %s.\nOutput:\n%s", err, string(e.Stderr))
 			}
 		}
 	}
