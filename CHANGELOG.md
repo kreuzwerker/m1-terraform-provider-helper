@@ -1,4 +1,10 @@
 
+<a name="0.7.5"></a>
+## [0.7.5] - 2022-07-26
+### bug fixes
+- Improve output of failed bash execution. ([3ae53f4](https://github.com/kreuzwerker/m1-terraform-provider-helper/commit/3ae53f4e9d1940683db9f5cb83f160fd88211403))
+
+
 <a name="0.7.4"></a>
 ## [0.7.4] - 2022-07-22
 ### features
