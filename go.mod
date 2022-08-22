@@ -8,7 +8,7 @@ require (
 	github.com/hashicorp/hcl/v2 v2.13.0
 	github.com/jarcoal/httpmock v1.2.0
 	github.com/spf13/cobra v1.5.0
-	github.com/zclconf/go-cty v1.10.0
+	github.com/zclconf/go-cty v1.11.0
 	golang.org/x/mod v0.5.1
 )
 
@@ -35,6 +35,6 @@ require (
 	golang.org/x/crypto v0.0.0-20220517005047-85d78b3ac167 // indirect
 	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect
 	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
-	golang.org/x/text v0.3.6 // indirect
+	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
