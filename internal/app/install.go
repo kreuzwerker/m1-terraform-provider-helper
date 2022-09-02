@@ -119,7 +119,8 @@ func cloneRepo(gitURL string, fullPath string) {
 }
 
 // if repo is not check out yet
-//		- clone to cli dir
+//   - clone to cli dir
+//
 // if already exists: dont clone, simply cd
 // on both casees: checkout version
 // return path to dir.
