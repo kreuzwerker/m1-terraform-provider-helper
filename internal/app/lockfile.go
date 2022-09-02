@@ -26,14 +26,14 @@ type ProviderConfig struct {
 }
 
 /*
-	1. find lockfile
-		parse the correct location
-		man kann auch per parameter den genauen pfad an den command mitgeben
-	2. parse lockfile
-	3. find the entries that have local providers
-		1. what to do when versions differ?
-	4. calculate hash sum of local providers and replace the has of the entries
-	5. Write HCL file back to original destination
+ 1. find lockfile
+    parse the correct location
+    man kann auch per parameter den genauen pfad an den command mitgeben
+ 2. parse lockfile
+ 3. find the entries that have local providers
+ 1. what to do when versions differ?
+ 4. calculate hash sum of local providers and replace the has of the entries
+ 5. Write HCL file back to original destination.
 */
 func (a *App) UpgradeLockfile(inputLockfilePath string, outputLockfilePath string) {
 	verifiedLockfilePath := getLockfile(inputLockfilePath)

@@ -26,11 +26,11 @@ endif
 
 # Dependency versions
 GOTESTSUM_VERSION = 1.8.1
-GOLANGCI_VERSION = 1.46.2
+GOLANGCI_VERSION = 1.49.0
 GITCHGLOG_VERSION = 0.15.1
 SVU_VERSION = 1.9.0
 
-GOLANG_VERSION = 1.18
+GOLANG_VERSION = 1.19
 
 # Add the ability to override some variables
 # Use with care

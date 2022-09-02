@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -93,7 +93,7 @@ func getProviderData(providerName string) (Provider, error) {
 	}
 
 	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 
 	if err != nil {
 		return Provider{}, fmt.Errorf("body reading error %w", err)
@@ -119,7 +119,8 @@ func cloneRepo(gitURL string, fullPath string) {
 }
 
 // if repo is not check out yet
-//		- clone to cli dir
+//   - clone to cli dir
+//
 // if already exists: dont clone, simply cd
 // on both casees: checkout version
 // return path to dir.
