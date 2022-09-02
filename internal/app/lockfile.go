@@ -33,7 +33,7 @@ type ProviderConfig struct {
  3. find the entries that have local providers
  1. what to do when versions differ?
  4. calculate hash sum of local providers and replace the has of the entries
- 5. Write HCL file back to original destination
+ 5. Write HCL file back to original destination.
 */
 func (a *App) UpgradeLockfile(inputLockfilePath string, outputLockfilePath string) {
 	verifiedLockfilePath := getLockfile(inputLockfilePath)
