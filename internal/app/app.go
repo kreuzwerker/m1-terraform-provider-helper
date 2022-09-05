@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 type App struct {
@@ -55,7 +57,7 @@ func New() *App {
 	if ok {
 		value, err = strconv.Atoi(rawValue)
 		if err != nil {
-			log.Fatal(err)
+			logrus.Fatalf("Error while trying to parse TF_HELPER_REQUEST_TIMEOUT. It should be a simple integer. Error: %v", err.Error())
 		}
 	}
 
