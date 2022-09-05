@@ -1,4 +1,10 @@
 
+<a name="0.7.6"></a>
+## [0.7.6] - 2022-09-05
+### features
+- Implement customizable request timeout. ([#88](https://github.com/kreuzwerker/m1-terraform-provider-helper/issues/88)) ([2b98f8f](https://github.com/kreuzwerker/m1-terraform-provider-helper/commit/2b98f8f4f28ab44b37bd85d0445cc10871ad7911))
+
+
 <a name="0.7.5"></a>
 ## [0.7.5] - 2022-07-26
 ### bug fixes
