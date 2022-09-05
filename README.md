@@ -25,6 +25,7 @@ A CLI to help with managing the installation and compilation of terraform provid
     - [Terraform Lockfile handling](#terraform-lockfile-handling)
     - [Providing custom build commands](#providing-custom-build-commands)
     - [Logging](#logging)
+    - [Timeouts](#timeouts)
   - [Development](#development)
     - [Testing](#testing)
     - [Build](#build)
@@ -103,6 +104,10 @@ Please refer to the documentation of the provider to find out the build command.
 ### Logging
 
 You can enable additional log output by setting the `TF_HELPER_LOG` environment variable to `info` or `debug` log level.
+
+### Timeouts
+
+The `m1-terraform-provider-helper` does make HTTP calls to the terraform provider registry. The default timeout is 10 seconds. You can change that timeout by using the `TF_HELPER_REQUEST_TIMEOUT` environment variable. For example `TF_HELPER_REQUEST_TIMEOUT=15` for a timeout of 15 seconds.
 
 ## Development
 

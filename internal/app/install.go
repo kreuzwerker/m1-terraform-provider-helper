@@ -20,8 +20,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const requestTimeoutSeconds int = 2
-
 type Provider struct {
 	Repo        string `json:"source"`
 	Description string `json:"description"`
@@ -71,10 +69,10 @@ func executeBashCommand(command string, baseDir string) string {
 	return string(output)
 }
 
-func getProviderData(providerName string) (Provider, error) {
+func getProviderData(providerName string, requestTimeoutInSeconds int) (Provider, error) {
 	url := "https://registry.terraform.io/v1/providers/" + providerName
 
-	client := &http.Client{Timeout: time.Second * time.Duration(float64(requestTimeoutSeconds))}
+	client := &http.Client{Timeout: time.Second * time.Duration(float64(requestTimeoutInSeconds))}
 	ctx := context.Background()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 
@@ -308,7 +306,7 @@ func getTerraformVersion() *goversion.Version {
 func (a *App) Install(providerName string, version string, customBuildCommand string) bool {
 	fmt.Fprintf(a.Out, "Getting provider data from terraform registry\n")
 
-	providerData, err := getProviderData(providerName)
+	providerData, err := getProviderData(providerName, a.Config.RequestTimeoutInSeconds)
 
 	if err != nil {
 		logrus.Fatalf("Error while trying to get provider data from terraform registry: %v", err.Error())
