@@ -6,7 +6,10 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 type App struct {
@@ -20,6 +23,7 @@ type Config struct {
 	BaseDir                  string
 	GoPath                   string
 	ProvidersCacheDir        string
+	RequestTimeoutInSeconds  int
 }
 
 const (
@@ -27,6 +31,7 @@ const (
 	DefaultTerraformPluginDir       = "/.terraform.d/plugins"
 	DefaultTerraformPluginBackupDir = "/.terraform.d/plugins_backup"
 	FileModePerm                    = 0777
+	DefaultRequestTimeoutInSeconds  = 10
 )
 
 func New() *App {
@@ -45,6 +50,18 @@ func New() *App {
 		},
 		Out: os.Stdout,
 	}
+
+	rawValue, ok := os.LookupEnv("TF_HELPER_REQUEST_TIMEOUT")
+	value := DefaultRequestTimeoutInSeconds
+
+	if ok {
+		value, err = strconv.Atoi(rawValue)
+		if err != nil {
+			logrus.Fatalf("Error while trying to parse TF_HELPER_REQUEST_TIMEOUT. It should be a simple integer. Error: %v", err.Error())
+		}
+	}
+
+	app.Config.RequestTimeoutInSeconds = value
 
 	return app
 }
