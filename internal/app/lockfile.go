@@ -171,6 +171,7 @@ func encodeHashSetTokens(hashes []string) hclwrite.Tokens {
 			},
 		}...)
 	}
+
 	ret = append(ret, &hclwrite.Token{
 		Type:  hclsyntax.TokenCBrack,
 		Bytes: []byte{']'},
