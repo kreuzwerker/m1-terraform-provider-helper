@@ -1,4 +1,10 @@
 
+<a name="0.7.7"></a>
+## [0.7.7] - 2022-09-07
+### bug fixes
+- Upgraded lockfile now has correct whitespace. ([#90](https://github.com/kreuzwerker/m1-terraform-provider-helper/issues/90)) ([a41c292](https://github.com/kreuzwerker/m1-terraform-provider-helper/commit/a41c292c59376d4d2f3eaf59c523e78d01202d47))
+
+
 <a name="0.7.6"></a>
 ## [0.7.6] - 2022-09-05
 ### features
