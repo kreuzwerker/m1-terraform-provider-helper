@@ -28,7 +28,10 @@ func TestCreateHclBody(t *testing.T) {
 provider "test" {
   version     = "1.0.0"
   constraints = "1.0.0"
-  hashes      = ["h1:test", "h1:test1"]
+  hashes = [
+    "h1:test",
+    "h1:test1",
+  ]
 }
 `
 
@@ -48,12 +51,16 @@ provider "test" {
 provider "test" {
   version     = "1.0.0"
   constraints = "1.0.0"
-  hashes      = ["h1:test"]
+  hashes = [
+    "h1:test",
+  ]
 }
 provider "test" {
   version     = "1.0.0"
   constraints = "1.0.0"
-  hashes      = ["h1:test"]
+  hashes = [
+    "h1:test",
+  ]
 }
 `
 
@@ -72,7 +79,9 @@ provider "test" {
 
 provider "test" {
   version = "1.0.0"
-  hashes  = ["h1:test"]
+  hashes = [
+    "h1:test",
+  ]
 }
 `
 
