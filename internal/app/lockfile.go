@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/hashicorp/hcl/v2/hclsimple"
+	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/zclconf/go-cty/cty"
 	"golang.org/x/mod/sumdb/dirhash"
@@ -122,19 +123,61 @@ func createHclBody(hcl Lockfile) string {
 			barBody.SetAttributeValue("constraints", cty.StringVal(*v.Constraints))
 		}
 
-		var listOfHashes []cty.Value
-		for _, hash := range v.Hashes {
-			listOfHashes = append(listOfHashes, cty.StringVal(hash))
+		if len(v.Hashes) > 0 {
+			hashToks := encodeHashSetTokens(v.Hashes)
+			barBody.SetAttributeRaw("hashes", hashToks)
 		}
-
-		list := cty.ListVal(listOfHashes)
-		barBody.SetAttributeValue("hashes", list)
 	}
 
 	convertedString := bytes.NewBuffer(f.Bytes()).String()
 	fullString := "# This file is maintained automatically by \"terraform init\".\n# Manual edits may be lost in future updates.\n\n" + convertedString
 
 	return fullString
+}
+
+// Taken from https://github.com/hashicorp/terraform/blob/aeefde7428b836646ba9622f1bb313e6dfe2ca87/internal/depsfile/locks_file.go#L454
+// Based on this issue: https://github.com/hashicorp/hcl/issues/542
+func encodeHashSetTokens(hashes []string) hclwrite.Tokens {
+	// We'll generate the source code in a low-level way here (direct
+	// token manipulation) because it's desirable to maintain exactly
+	// the layout implemented here so that diffs against the locks
+	// file are easy to read; we don't want potential future changes to
+	// hclwrite to inadvertently introduce whitespace changes here.
+	ret := hclwrite.Tokens{
+		{
+			Type:  hclsyntax.TokenOBrack,
+			Bytes: []byte{'['},
+		},
+		{
+			Type:  hclsyntax.TokenNewline,
+			Bytes: []byte{'\n'},
+		},
+	}
+
+	// Although lock.hashes is a slice, we de-dupe and sort it on
+	// initialization so it's normalized for interpretation as a logical
+	// set, and so we can just trust it's already in a good order here.
+	for _, hash := range hashes {
+		hashVal := cty.StringVal(hash)
+		ret = append(ret, hclwrite.TokensForValue(hashVal)...)
+		ret = append(ret, hclwrite.Tokens{
+			{
+				Type:  hclsyntax.TokenComma,
+				Bytes: []byte{','},
+			},
+			{
+				Type:  hclsyntax.TokenNewline,
+				Bytes: []byte{'\n'},
+			},
+		}...)
+	}
+
+	ret = append(ret, &hclwrite.Token{
+		Type:  hclsyntax.TokenCBrack,
+		Bytes: []byte{']'},
+	})
+
+	return ret
 }
 
 func getCalculatedHashForProvider(fullPath string) string {
