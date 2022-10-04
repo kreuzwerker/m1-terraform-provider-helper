@@ -71,7 +71,7 @@ func TestGetProviderData(t *testing.T) {
 		httpmock.RegisterResponder("GET", "https://registry.terraform.io/v1/providers/"+provider,
 			httpmock.NewStringResponder(200, `{"description": "`+description+`",
 			"source": "`+repo+`"}`))
-		providerData, err := getProviderData(provider, 2)
+		providerData, err := getProviderData(provider, 2, "")
 		if err != nil {
 			t.Errorf("Should not have an error %s ", err)
 		}
@@ -89,7 +89,7 @@ func TestGetProviderData(t *testing.T) {
 		httpmock.RegisterResponder("GET", "https://registry.terraform.io/v1/providers/"+provider,
 			httpmock.NewStringResponder(200, `{"description": "`+description+`",
 			"source": "`+repo+`"}`).Delay(3*time.Second))
-		_, err := getProviderData(provider, 2)
+		_, err := getProviderData(provider, 2, "")
 		if !strings.HasPrefix(err.Error(), "timeout error") {
 			t.Errorf("Expected \"error timeout\" but got %#v", err.Error())
 		}
@@ -103,7 +103,7 @@ func TestGetProviderData(t *testing.T) {
 		defer httpmock.DeactivateAndReset()
 		httpmock.RegisterResponder("GET", "https://registry.terraform.io/v1/providers/"+provider,
 			httpmock.NewStringResponder(200, `{"test:"812}`))
-		_, err := getProviderData(provider, 2)
+		_, err := getProviderData(provider, 2, "")
 		if err == nil {
 			t.Error("Should run into JSON parse error")
 		}

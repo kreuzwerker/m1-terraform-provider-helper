@@ -13,6 +13,8 @@ func installCmd() *cobra.Command {
 
 	var customBuildCommand string
 
+	var customTerraformRegistryURL string
+
 	cmd := &cobra.Command{
 		Use:   "install [providerName]",
 		Args:  cobra.ExactArgs(1),
@@ -23,7 +25,7 @@ func installCmd() *cobra.Command {
 			a.Init()
 
 			if a.IsTerraformPluginDirExistent() {
-				a.Install(args[0], versionString, customBuildCommand)
+				a.Install(args[0], versionString, customBuildCommand, customTerraformRegistryURL)
 			} else {
 				fmt.Fprintln(os.Stdout, "Please activate first")
 			}
@@ -33,6 +35,7 @@ func installCmd() *cobra.Command {
 	}
 	cmd.Flags().StringVarP(&versionString, "version", "v", "", "The version of the provider")
 	cmd.Flags().StringVar(&customBuildCommand, "custom-build-command", "", "A custom build command to execute instead of the built-in commands")
+	cmd.Flags().StringVarP(&customTerraformRegistryURL, "custom-terraform-registry-url", "u", "", "A custom URL of terraform registry")
 
 	return cmd
 }

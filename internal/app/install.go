@@ -69,8 +69,14 @@ func executeBashCommand(command string, baseDir string) string {
 	return string(output)
 }
 
-func getProviderData(providerName string, requestTimeoutInSeconds int) (Provider, error) {
-	url := "https://registry.terraform.io/v1/providers/" + providerName
+func getProviderData(providerName string, requestTimeoutInSeconds int, customTerraformRegistryURL string) (Provider, error) {
+	urlPrefix := "https://registry.terraform.io/v1/providers/"
+	if customTerraformRegistryURL != "" {
+		fmt.Println(customTerraformRegistryURL)
+		urlPrefix = customTerraformRegistryURL
+	}
+
+	url := urlPrefix + providerName
 
 	client := &http.Client{Timeout: time.Second * time.Duration(float64(requestTimeoutInSeconds))}
 	ctx := context.Background()
@@ -92,6 +98,8 @@ func getProviderData(providerName string, requestTimeoutInSeconds int) (Provider
 
 	defer res.Body.Close()
 	body, err := io.ReadAll(res.Body)
+
+	fmt.Println(string(body))
 
 	if err != nil {
 		return Provider{}, fmt.Errorf("body reading error %w", err)
@@ -303,10 +311,10 @@ func getTerraformVersion() *goversion.Version {
 	return parsedVersion
 }
 
-func (a *App) Install(providerName string, version string, customBuildCommand string) bool {
+func (a *App) Install(providerName string, version string, customBuildCommand string, customTerraformRegistryURL string) bool {
 	fmt.Fprintf(a.Out, "Getting provider data from terraform registry\n")
 
-	providerData, err := getProviderData(providerName, a.Config.RequestTimeoutInSeconds)
+	providerData, err := getProviderData(providerName, a.Config.RequestTimeoutInSeconds, customTerraformRegistryURL)
 
 	if err != nil {
 		logrus.Fatalf("Error while trying to get provider data from terraform registry: %v", err.Error())
