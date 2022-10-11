@@ -24,8 +24,12 @@ func installCmd() *cobra.Command {
 			a := app.New()
 			a.Init()
 
+			if customTerraformRegistryURL != "" {
+				a.SetTerraformRegistryURL(customTerraformRegistryURL)
+			}
+
 			if a.IsTerraformPluginDirExistent() {
-				a.Install(args[0], versionString, customBuildCommand, customTerraformRegistryURL)
+				a.Install(args[0], versionString, customBuildCommand)
 			} else {
 				fmt.Fprintln(os.Stdout, "Please activate first")
 			}
