@@ -33,6 +33,7 @@ func setupTestAppInstance(t *testing.T) (app.App, *bytes.Buffer) {
 		BaseDir:                  tmpDir,
 		GoPath:                   app.GetCurrentGoPath(),
 		ProvidersCacheDir:        tmpDir + "/cliCache",
+		TerraformRegistryURL:     app.DefaultTerraformRegistryURL,
 	}
 	app := app.App{
 		Config: &config,

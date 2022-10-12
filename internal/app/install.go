@@ -69,8 +69,12 @@ func executeBashCommand(command string, baseDir string) string {
 	return string(output)
 }
 
-func getProviderData(providerName string, requestTimeoutInSeconds int) (Provider, error) {
-	url := "https://registry.terraform.io/v1/providers/" + providerName
+func (a *App) GetProviderData(providerName string) (Provider, error) {
+	return getProviderData(providerName, a.Config.RequestTimeoutInSeconds, a.Config.TerraformRegistryURL)
+}
+
+func getProviderData(providerName string, requestTimeoutInSeconds int, terraformRegistryURL string) (Provider, error) {
+	url := terraformRegistryURL + providerName
 
 	client := &http.Client{Timeout: time.Second * time.Duration(float64(requestTimeoutInSeconds))}
 	ctx := context.Background()
@@ -306,7 +310,7 @@ func getTerraformVersion() *goversion.Version {
 func (a *App) Install(providerName string, version string, customBuildCommand string) bool {
 	fmt.Fprintf(a.Out, "Getting provider data from terraform registry\n")
 
-	providerData, err := getProviderData(providerName, a.Config.RequestTimeoutInSeconds)
+	providerData, err := a.GetProviderData(providerName)
 
 	if err != nil {
 		logrus.Fatalf("Error while trying to get provider data from terraform registry: %v", err.Error())
