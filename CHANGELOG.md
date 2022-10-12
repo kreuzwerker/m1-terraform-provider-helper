@@ -1,4 +1,10 @@
 
+<a name="0.8.0"></a>
+## [0.8.0] - 2022-10-12
+### features
+- CLI argument for custom registry URL was introduced ([#93](https://github.com/kreuzwerker/m1-terraform-provider-helper/issues/93)) ([3759eb5](https://github.com/kreuzwerker/m1-terraform-provider-helper/commit/3759eb5c5039d9eca0005b210f96a860ac0e95e4))
+
+
 <a name="0.7.7"></a>
 ## [0.7.7] - 2022-09-07
 ### bug fixes
