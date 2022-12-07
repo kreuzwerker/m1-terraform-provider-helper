@@ -12,7 +12,7 @@ func lockfileUpgradeCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "upgrade",
-		Short: "Upgrades the hashes in a terraform lockfile",
+		Short: "Upgrades the hashes in a Terraform lockfile",
 		Long:  "",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			a := app.New()
