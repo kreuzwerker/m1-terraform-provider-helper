@@ -18,8 +18,8 @@ func installCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "install [providerName]",
 		Args:  cobra.ExactArgs(1),
-		Short: "Downloads (and compiles) a terraform provider for the M1 chip",
-		Long:  "Download and compiles the specifiec terraform provider for your M1 chip. Provider name is the terraform registry identifier, e.g. \"hashicorp/aws\"",
+		Short: "Downloads (and compiles) a Terraform provider for the M1 chip",
+		Long:  "Download and compiles the specific Terraform provider for your M1 chip. Provider name is the Terraform registry identifier, e.g. \"hashicorp/aws\"",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			a := app.New()
 			a.Init()
@@ -39,7 +39,7 @@ func installCmd() *cobra.Command {
 	}
 	cmd.Flags().StringVarP(&versionString, "version", "v", "", "The version of the provider")
 	cmd.Flags().StringVar(&customBuildCommand, "custom-build-command", "", "A custom build command to execute instead of the built-in commands")
-	cmd.Flags().StringVarP(&customTerraformRegistryURL, "custom-terraform-registry-url", "u", "", "A custom URL of terraform registry")
+	cmd.Flags().StringVarP(&customTerraformRegistryURL, "custom-terraform-registry-url", "u", "", "A custom URL of Terraform registry")
 
 	return cmd
 }
