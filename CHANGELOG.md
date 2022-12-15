@@ -1,4 +1,10 @@
 
+<a name="0.8.1"></a>
+## [0.8.1] - 2022-12-15
+### bug fixes
+- Typo in install long command output ([#104](https://github.com/kreuzwerker/m1-terraform-provider-helper/issues/104)) ([c2f32ba](https://github.com/kreuzwerker/m1-terraform-provider-helper/commit/c2f32bab7d14f1285a5f457f9474ede26e2da7b6))
+
+
 <a name="0.8.0"></a>
 ## [0.8.0] - 2022-10-12
 ### features
