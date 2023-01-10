@@ -22,10 +22,12 @@ A CLI to help with managing the installation and compilation of terraform provid
   - [Motivation](#motivation)
   - [Installation](#installation)
   - [Usage](#usage)
+    - [Debugging Installation Problems](#debugging-installation-problems)
     - [Terraform Lockfile handling](#terraform-lockfile-handling)
     - [Providing custom build commands](#providing-custom-build-commands)
     - [Logging](#logging)
     - [Timeouts](#timeouts)
+    - [Plugin Directory](#plugin-directory)
   - [Development](#development)
     - [Testing](#testing)
     - [Build](#build)
@@ -71,6 +73,13 @@ m1-terraform-provider-helper activate # (In case you have not activated the help
 m1-terraform-provider-helper install hashicorp/vault -v v2.10.0 # Install and compile
 ```
 
+### Debugging Installation Problems
+
+The `install` commands relies on an internal `buildCommands` map to find the correct build command for an provider. If the command is not correct, you can provide a custom build command by using the `--build-command` flag. See [Providing custom build commands](#providing-custom-build-commands) for more details.
+In order to find the correct build command, please take a look at the documentation of the provider you are trying to install.
+
+The `m1-terraform-provider-helper` downloads the source code of the provider to `$HOME/.m1-terraform-provider-helper`, which means you can actually play around with the source code and try to compile it yourself.
+
 ### Terraform Lockfile handling
 
 tl;dr: Use `m1-terraform-provider-helper lockfile upgrade` to add the checksum of all used local providers to your projects `.terraform.lock.hcl`. Use the `--help` flag to see all available options for specifying input and output directories.
@@ -108,6 +117,13 @@ You can enable additional log output by setting the `TF_HELPER_LOG` environment 
 ### Timeouts
 
 The `m1-terraform-provider-helper` does make HTTP calls to the terraform provider registry. The default timeout is 10 seconds. You can change that timeout by using the `TF_HELPER_REQUEST_TIMEOUT` environment variable. For example `TF_HELPER_REQUEST_TIMEOUT=15` for a timeout of 15 seconds.
+
+### Plugin Directory
+
+The destination and name of the compiled provider depends on the terraform version:
+
+* For Terraform `<0.13` it is `~/.terraform.d/plugins/darwin_arm64/terraform-provider-template_v2.2.0` (based on https://developer.hashicorp.com/terraform/language/v1.1.x/configuration-0-11/providers#plugin-names-and-versions)
+* For all Terraform versions `>=0.13` it is `~/.terraform.d/plugins/registry.terraform.io/${providerName}/${version}/darwin_arm64/terraform-provider-template_2.2.0_x5` (based on https://developer.hashicorp.com/terraform/cli/config/config-file#implied-local-mirror-directories)
 
 ## Development
 
