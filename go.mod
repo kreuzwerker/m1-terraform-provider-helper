@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/go-git/go-git/v5 v5.5.2
 	github.com/hashicorp/go-version v1.6.0
-	github.com/hashicorp/hcl/v2 v2.15.0
+	github.com/hashicorp/hcl/v2 v2.16.0
 	github.com/jarcoal/httpmock v1.2.0
 	github.com/spf13/cobra v1.6.1
 	github.com/zclconf/go-cty v1.12.1
