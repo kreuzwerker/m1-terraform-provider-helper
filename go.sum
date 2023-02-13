@@ -66,6 +66,8 @@ github.com/hashicorp/hcl/v2 v2.15.0 h1:CPDXO6+uORPjKflkWCCwoWc9uRp+zSIPcCQ+BrxV7
 github.com/hashicorp/hcl/v2 v2.15.0/go.mod h1:JRmR89jycNkrrqnMmvPDMd56n1rQJ2Q6KocSLCMCXng=
 github.com/hashicorp/hcl/v2 v2.16.0 h1:MPq1q615H+9wBAdE3EbwEd6imSohElrIguuasbQruB0=
 github.com/hashicorp/hcl/v2 v2.16.0/go.mod h1:JRmR89jycNkrrqnMmvPDMd56n1rQJ2Q6KocSLCMCXng=
+github.com/hashicorp/hcl/v2 v2.16.1 h1:BwuxEMD/tsYgbhIW7UuI3crjovf3MzuFWiVgiv57iHg=
+github.com/hashicorp/hcl/v2 v2.16.1/go.mod h1:JRmR89jycNkrrqnMmvPDMd56n1rQJ2Q6KocSLCMCXng=
 github.com/imdario/mergo v0.3.12 h1:b6R2BslTbIEToALKP7LxUvijTsNI9TAe80pLWN2g/HU=
 github.com/imdario/mergo v0.3.12/go.mod h1:jmQim1M+e3UYxmgPu/WyfjB3N3VflVyUjjjwH0dnCYA=
 github.com/imdario/mergo v0.3.13 h1:lFzP57bqS/wsqKssCGmtLAb8A0wKjLGrve2q3PPVcBk=
