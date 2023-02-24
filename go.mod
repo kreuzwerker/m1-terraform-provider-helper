@@ -8,7 +8,7 @@ require (
 	github.com/hashicorp/hcl/v2 v2.16.1
 	github.com/jarcoal/httpmock v1.3.0
 	github.com/spf13/cobra v1.6.1
-	github.com/zclconf/go-cty v1.12.1
+	github.com/zclconf/go-cty v1.13.0
 	golang.org/x/mod v0.8.0
 )
 
