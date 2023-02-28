@@ -3,7 +3,7 @@ module github.com/kreuzwerker/m1-terraform-provider-helper
 go 1.19
 
 require (
-	github.com/go-git/go-git/v5 v5.5.2
+	github.com/go-git/go-git/v5 v5.6.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/hashicorp/hcl/v2 v2.16.1
 	github.com/jarcoal/httpmock v1.3.0
@@ -14,7 +14,7 @@ require (
 
 require (
 	github.com/cloudflare/circl v1.1.0 // indirect
-	github.com/pjbgf/sha1cd v0.2.3 // indirect
+	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/skeema/knownhosts v1.1.0 // indirect
 )
 
