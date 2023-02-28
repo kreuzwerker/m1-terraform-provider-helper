@@ -30,7 +30,7 @@ jobs:
           infile: ./dist/test_results/main/coverage.out
           outfile: ./dist/test_results/main/coverage.lcov
       - name: Upload coverage
-        uses: coverallsapp/github-action@1.1.3
+        uses: coverallsapp/github-action@v1.2.2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./dist/test_results/main/coverage.lcov
