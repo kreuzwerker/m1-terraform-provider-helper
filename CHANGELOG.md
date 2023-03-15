@@ -1,4 +1,10 @@
 
+<a name="0.8.2"></a>
+## [0.8.2] - 2023-03-15
+### bug fixes
+- Git outputs should be language agnostic. ([#126](https://github.com/kreuzwerker/m1-terraform-provider-helper/issues/126)) ([45786d7](https://github.com/kreuzwerker/m1-terraform-provider-helper/commit/45786d75fc7c9265fb801eee6dd2a75088f50962))
+
+
 <a name="0.8.1"></a>
 ## [0.8.1] - 2022-12-15
 ### bug fixes
