@@ -145,8 +145,12 @@ func checkoutSourceCode(baseDir string, gitURL string, version string) string {
 
 	// Clean the repository
 	logrus.Infof("Resetting %s and pulling latest changes", fullPath)
-	executeBashCommand("git reset --hard && git clean -d -f -q", fullPath)
-	executeBashCommand("git remote show origin | sed -n '/HEAD branch/s/.*: //p'| xargs git checkout && git pull", fullPath)
+
+	err = w.Reset(&git.ResetOptions{Mode: git.HardReset})
+	CheckIfError(err)
+	err = w.Clean(&git.CleanOptions{Dir: true})
+	CheckIfError(err)
+	executeBashCommand("LC_ALL=C git remote show origin | sed -n '/HEAD branch/s/.*: //p'| xargs git checkout && git pull", fullPath)
 
 	if len(version) > 0 {
 		logrus.Infof("Checking out %s", version)
