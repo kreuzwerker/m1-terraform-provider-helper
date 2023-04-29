@@ -8,12 +8,12 @@
 # m1-terraform-provider-helper
 
 [![Release](https://img.shields.io/github/v/release/kreuzwerker/m1-terraform-provider-helper)](https://github.com/kreuzwerker/m1-terraform-provider-helper/releases)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/kreuzwerker/m1-terraform-provider-helper/blob/main/LICENSE)  
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/kreuzwerker/m1-terraform-provider-helper/blob/main/LICENSE)
 [![Go Status](https://github.com/kreuzwerker/m1-terraform-provider-helper/workflows/tests/badge.svg)](https://github.com/kreuzwerker/m1-terraform-provider-helper/actions)
 [![Lint Status](https://github.com/kreuzwerker/m1-terraform-provider-helper/workflows/golangci-lint/badge.svg)](https://github.com/kreuzwerker/m1-terraform-provider-helper/actions)
-[![Go Report Card](https://goreportcard.com/badge/github.com/kreuzwerker/m1-terraform-provider-helper)](https://goreportcard.com/report/github.com/kreuzwerker/m1-terraform-provider-helper)  
+[![Go Report Card](https://goreportcard.com/badge/github.com/kreuzwerker/m1-terraform-provider-helper)](https://goreportcard.com/report/github.com/kreuzwerker/m1-terraform-provider-helper)
 
-A CLI to help with managing the installation and compilation of terraform providers when running a new M1 Mac. 
+A CLI to manage the installation and compilation of Terraform providers for an ARM-based Mac.
 
 ## Table of Contents
 
@@ -36,7 +36,14 @@ A CLI to help with managing the installation and compilation of terraform provid
   - [License](#license)
 ## Motivation
 
-While using my new Macbook with M1 chip I often encountered issues in client projects when working with Terraform projects. Either some terraform providers have no adapted to the new `darwin_arm64` at all or the version of the used provider is pinned to an older version. In both cases, there is no pre-compiled binary for `darwin_arm64` => you have to compile it yourself. There is a nice writeup on how to compile in a [Terraform Issue](https://github.com/hashicorp/terraform/issues/27257#issuecomment-754777716). As I am constantly switching forth and back between using own-compiled binaries and pre-build, I wanted to have an elegant solution which manages all the details by itself.
+While using my then-new MacBook with an M1 chip, I often encountered issues in client projects when
+working with Terraform. Some Terraform providers hadn't adapted to the new `darwin_arm64` architecture at
+all, or else the provider was pinned to an older, incompatible version. In both cases, there was no
+pre-compiled binary for `darwin_arm64`; you had to compile it yourself. (There's a nice write-up on how to
+compile in a
+[Terraform Issue](https://github.com/hashicorp/terraform/issues/27257#issuecomment-754777716).) As I was
+constantly switching back and forth between own-compiled binaries and pre-built ones, I wanted an elegant
+solution that managed all the details by itself.
 
 ## Installation
 
@@ -55,27 +62,30 @@ binary in your PATH.) Ensure that the command `go version` succeeds before using
 ## Usage
 
 ```
-A CLI to manage the installation of terraform providers for the Mac M1 chip
+A CLI to manage the installation of Terraform providers for the Mac M1 chip
 
 Usage:
   m1-terraform-provider-helper [command]
 
 Available Commands:
   activate    Activate the usage of m1 provider helper
+  completion  Generate the autocompletion script for the specified shell
   deactivate  Deactivate the usage of M1 provider helper
   help        Help about any command
-  install     Downloads (and compiles) a terraform provider for the M1 chip
+  install     Downloads (and compiles) a Terraform provider for the M1 chip
   list        Lists all available providers and their versions
-  lockfile    Commands to work with terraform lockfiles
+  lockfile    Commands to work with Terraform lockfiles
   status      Shows the status of the m1 provider installations
-  version     Display the current version
+  version     Displays the current version
 
 Flags:
   -h, --help   help for m1-terraform-provider-helper
+
+Use "m1-terraform-provider-helper [command] --help" for more information about a command.
 ```
 
 Example:
-You want to install the `terraform-provider-vault` in version `v2.10.0` because you are using it in a project and let's assume it has no pre-build binary for Mac M1:
+You want to install version `v2.10.0` of `terraform-provider-vault` because you're using it in a project. Let's assume it has no pre-built binary for an ARM-based Mac:
 
 ```sh
 m1-terraform-provider-helper activate # (In case you have not activated the helper)
@@ -106,7 +116,7 @@ checksums previously recorded in the dependency lock file.
 The reason is that the checksums inside the existing lockfile are the checksum of the previously installed `darwin_amd64` provider. Now we are using our own `darwin_arm64` compiled provider, which has a different checksum. In order to make `terraform init` work again, we have to add the checksum of the local provider to the lockfile.
 
 This is done via the `m1-terraform-provider-helper lockfile upgrade` command. It also two flags which you can use to specify the input/output lockfile:
-* `--input-lockfile-path` 
+* `--input-lockfile-path`
 * `--output-path`
 
 
@@ -175,7 +185,7 @@ If you want it automated prepend `TAG=1` to the command as follows:
 ```sh
 # TAG=1 indicates to tag and generate the changelog
 TAG=1 make minor
-git push origin main --tags 
+git push origin main --tags
 ```
 
 ## License
