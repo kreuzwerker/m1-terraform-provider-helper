@@ -21,6 +21,7 @@ A CLI to help with managing the installation and compilation of terraform provid
   - [Table of Contents](#table-of-contents)
   - [Motivation](#motivation)
   - [Installation](#installation)
+    - [Dependencies](#dependencies)
   - [Usage](#usage)
     - [Debugging Installation Problems](#debugging-installation-problems)
     - [Terraform Lockfile handling](#terraform-lockfile-handling)
@@ -42,6 +43,14 @@ While using my new Macbook with M1 chip I often encountered issues in client pro
 ```sh
 brew install kreuzwerker/taps/m1-terraform-provider-helper
 ```
+
+### Dependencies
+
+Since Go is used to build the providers, you need to have a working Go setup in the local directory where you run m1-terraform-provider-helper
+commands. Although Go is installed by Homebrew as a dependency
+of m1-terraform-provider-helper, the Go binary won't necessarily be in your PATH. (For example, if you use
+asdf or a similar version manager for Go, the version manager's shim likely comes before Homebrew's Go
+binary in your PATH.) Ensure that the command `go version` succeeds before using this tool.
 
 ## Usage
 
