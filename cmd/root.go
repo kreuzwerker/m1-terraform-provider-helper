@@ -15,7 +15,7 @@ import (
 func RootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "m1-terraform-provider-helper",
-		Short: "A CLI to manage the installation of Terraform providers for the Mac M1 chip",
+		Short: "A CLI to manage the installation of Terraform providers for an ARM-based Mac",
 	}
 
 	cmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {

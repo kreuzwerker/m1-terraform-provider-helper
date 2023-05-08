@@ -8,7 +8,7 @@ import (
 func activateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "activate",
-		Short: "Activate the usage of m1 provider helper",
+		Short: "Activate the m1-terraform-provider-helper",
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			a := app.New()

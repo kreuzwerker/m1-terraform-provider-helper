@@ -8,7 +8,7 @@ import (
 func statusCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "status",
-		Short: "Shows the status of the m1 provider installations",
+		Short: "Show the status of the m1-terraform-provider-helper installation",
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			a := app.New()

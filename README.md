@@ -62,21 +62,21 @@ binary in your PATH.) Ensure that the command `go version` succeeds before using
 ## Usage
 
 ```
-A CLI to manage the installation of Terraform providers for the Mac M1 chip
+A CLI to manage the installation of Terraform providers for an ARM-based Mac
 
 Usage:
   m1-terraform-provider-helper [command]
 
 Available Commands:
-  activate    Activate the usage of m1 provider helper
+  activate    Activate the m1-terraform-provider-helper
   completion  Generate the autocompletion script for the specified shell
-  deactivate  Deactivate the usage of M1 provider helper
+  deactivate  Deactivate the m1-terraform-provider-helper
   help        Help about any command
-  install     Downloads (and compiles) a Terraform provider for the M1 chip
-  list        Lists all available providers and their versions
+  install     Download (and compile) a Terraform provider for an ARM-based Mac
+  list        List all available providers and their versions
   lockfile    Commands to work with Terraform lockfiles
-  status      Shows the status of the m1 provider installations
-  version     Displays the current version
+  status      Show the status of the m1-terraform-provider-helper installation
+  version     Display the current version
 
 Flags:
   -h, --help   help for m1-terraform-provider-helper
