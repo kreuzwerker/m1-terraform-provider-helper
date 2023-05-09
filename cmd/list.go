@@ -8,7 +8,7 @@ import (
 func listCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list",
-		Short: "Lists all available providers and their versions",
+		Short: "List all available providers and their versions",
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			a := app.New()

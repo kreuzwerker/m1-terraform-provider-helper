@@ -8,7 +8,7 @@ import (
 func deactivateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "deactivate",
-		Short: "Deactivate the usage of M1 provider helper",
+		Short: "Deactivate the m1-terraform-provider-helper",
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			a := app.New()

@@ -18,8 +18,8 @@ func installCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "install [providerName]",
 		Args:  cobra.ExactArgs(1),
-		Short: "Downloads (and compiles) a Terraform provider for the M1 chip",
-		Long:  "Download and compiles the specific Terraform provider for your M1 chip. Provider name is the Terraform registry identifier, e.g. \"hashicorp/aws\"",
+		Short: "Download (and compile) a Terraform provider for an ARM-based Mac",
+		Long:  "Download and compile a specific Terraform provider for an ARM-based Mac. Provider name is the Terraform registry identifier (e.g., \"hashicorp/aws\")",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			a := app.New()
 			a.Init()
