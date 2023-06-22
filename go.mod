@@ -9,7 +9,7 @@ require (
 	github.com/jarcoal/httpmock v1.3.0
 	github.com/spf13/cobra v1.7.0
 	github.com/zclconf/go-cty v1.13.2
-	golang.org/x/mod v0.10.0
+	golang.org/x/mod v0.11.0
 )
 
 require (
