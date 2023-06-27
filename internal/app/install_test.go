@@ -108,6 +108,18 @@ func TestGetProviderData(t *testing.T) {
 			t.Error("Should run into JSON parse error")
 		}
 	})
+
+	t.Run("Should error with mismatched JSON due to non existing provider data", func(t *testing.T) {
+		provider := "hashicorp/vault"
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+		httpmock.RegisterResponder("GET", "https://registry.terraform.io/v1/providers/"+provider,
+			httpmock.NewStringResponder(200, `{"errors":["Not Found"]}`))
+		_, err := getProviderData(provider, 2, DefaultTerraformRegistryURL)
+		if err == nil {
+			t.Error("Should run into JSON parse error")
+		}
+	})
 }
 
 func TestCheckoutSourceCode(t *testing.T) {
