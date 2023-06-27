@@ -24,6 +24,7 @@ type Config struct {
 	GoPath                   string
 	ProvidersCacheDir        string
 	TerraformRegistryURL     string
+	ProviderRepositoryURL    string
 	RequestTimeoutInSeconds  int
 }
 
@@ -183,4 +184,8 @@ func (a *App) ListProviders() {
 
 func (a *App) SetTerraformRegistryURL(url string) {
 	a.Config.TerraformRegistryURL = url
+}
+
+func (a *App) SetCustomProviderRepositoryURL(url string) {
+	a.Config.ProviderRepositoryURL = url
 }

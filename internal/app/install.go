@@ -70,10 +70,18 @@ func executeBashCommand(command string, baseDir string) string {
 }
 
 func (a *App) GetProviderData(providerName string) (Provider, error) {
-	return getProviderData(providerName, a.Config.RequestTimeoutInSeconds, a.Config.TerraformRegistryURL)
+	return getProviderData(providerName, a.Config.RequestTimeoutInSeconds, a.Config.TerraformRegistryURL, a.Config.ProviderRepositoryURL)
 }
 
-func getProviderData(providerName string, requestTimeoutInSeconds int, terraformRegistryURL string) (Provider, error) {
+func getProviderData(providerName string, requestTimeoutInSeconds int, terraformRegistryURL, providerRepositoryURL string) (Provider, error) {
+	if providerRepositoryURL != "" {
+		log.Printf("Using custom provider repository url: '%s'\n", providerRepositoryURL)
+		return Provider{
+			Repo:        providerRepositoryURL,
+			Description: "Custom provider url",
+		}, nil
+	}
+
 	url := terraformRegistryURL + providerName
 	log.Printf("Getting provider data from %s\n", url)
 
