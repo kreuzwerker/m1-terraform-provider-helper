@@ -75,7 +75,7 @@ func (a *App) GetProviderData(providerName string) (Provider, error) {
 
 func getProviderData(providerName string, requestTimeoutInSeconds int, terraformRegistryURL string) (Provider, error) {
 	url := terraformRegistryURL + providerName
-	fmt.Printf("Getting provider data from %s\n", url)
+	log.Printf("Getting provider data from %s\n", url)
 
 	client := &http.Client{Timeout: time.Second * time.Duration(float64(requestTimeoutInSeconds))}
 	ctx := context.Background()
@@ -135,7 +135,7 @@ func checkoutSourceCode(baseDir string, gitURL string, version string) string {
 	var r *git.Repository
 
 	repoDir := extractRepoNameFromURL(gitURL)
-	fmt.Printf("Extracted repo %s to %s", gitURL, repoDir)
+	log.Printf("Extracted repo %s to %s", gitURL, repoDir)
 	fullPath := baseDir + "/" + repoDir
 
 	if !isDirExistent(fullPath) {
@@ -327,7 +327,7 @@ func (a *App) Install(providerName string, version string, customBuildCommand st
 		logrus.Fatalf("Error while trying to get provider data from terraform registry: %v", err.Error())
 	}
 
-	fmt.Printf("Provider data: %v\n", providerData)
+	log.Printf("Provider data: %v\n", providerData)
 
 	gitRepo := providerData.Repo
 
