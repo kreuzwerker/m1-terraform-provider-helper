@@ -109,6 +109,10 @@ func getProviderData(providerName string, requestTimeoutInSeconds int, terraform
 		return Provider{}, fmt.Errorf("could not parse JSON %w", err)
 	}
 
+	if data.Repo == "" {
+		return Provider{}, fmt.Errorf("parsed JSON but repo could no be determined. Got json '%s' from url: '%s'", body, url)
+	}
+
 	return data, nil
 }
 

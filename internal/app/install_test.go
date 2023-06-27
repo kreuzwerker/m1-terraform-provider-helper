@@ -117,7 +117,7 @@ func TestGetProviderData(t *testing.T) {
 			httpmock.NewStringResponder(200, `{"errors":["Not Found"]}`))
 		_, err := getProviderData(provider, 2, DefaultTerraformRegistryURL)
 		if err == nil {
-			t.Error("Should run into JSON parse error")
+			t.Error("Should run into empty repo string error")
 		}
 	})
 }
