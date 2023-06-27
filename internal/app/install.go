@@ -76,6 +76,7 @@ func (a *App) GetProviderData(providerName string) (Provider, error) {
 func getProviderData(providerName string, requestTimeoutInSeconds int, terraformRegistryURL, providerRepositoryURL string) (Provider, error) {
 	if providerRepositoryURL != "" {
 		log.Printf("Using custom provider repository url: '%s'\n", providerRepositoryURL)
+
 		return Provider{
 			Repo:        providerRepositoryURL,
 			Description: "Custom provider url",
