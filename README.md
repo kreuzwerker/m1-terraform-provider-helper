@@ -26,6 +26,7 @@ A CLI to manage the installation and compilation of Terraform providers for an A
     - [Debugging Installation Problems](#debugging-installation-problems)
     - [Terraform Lockfile handling](#terraform-lockfile-handling)
     - [Providing custom build commands](#providing-custom-build-commands)
+    - [Providing custom provider repository](#providing-custom-provider-repository)
     - [Logging](#logging)
     - [Timeouts](#timeouts)
     - [Plugin Directory](#plugin-directory)
@@ -128,6 +129,19 @@ You can override the built-in build command handling by using the `--custom-buil
 The `install` commands relies on an internal `buildCommands` map to find the correct build command for an provider. For some important providers we have hardcoded different commands, but the default (and fallback) is `make build`. If that does not work for the provider you want to install, you can also pass a custom build command using the `--custom-build-command` flag.
 
 Please refer to the documentation of the provider to find out the build command.
+
+### Providing custom provider repository
+You can override the built-in querying mechanism of the terraform registry by using the `--custom-provider-repository-url` flag.
+
+**Explanation**:
+The `install` commands relies on an internal queries the default terraform registry url (which you can also override), to 
+determine the url of the git repository of the desired provider. However, for some providers there is no url 
+as they are, e.g. already *archived*. 
+
+For example for the mysql provider the command would be
+```sh
+m1-terraform-provider-helper install hashicorp/terraform-provider-mysql -v v1.9.0 --custom-provider-repository-url "https://github.com/hashicorp/terraform-provider-mysql"
+```
 
 ### Logging
 
