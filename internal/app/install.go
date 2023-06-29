@@ -70,11 +70,21 @@ func executeBashCommand(command string, baseDir string) string {
 }
 
 func (a *App) GetProviderData(providerName string) (Provider, error) {
-	return getProviderData(providerName, a.Config.RequestTimeoutInSeconds, a.Config.TerraformRegistryURL)
+	return getProviderData(providerName, a.Config.RequestTimeoutInSeconds, a.Config.TerraformRegistryURL, a.Config.ProviderRepositoryURL)
 }
 
-func getProviderData(providerName string, requestTimeoutInSeconds int, terraformRegistryURL string) (Provider, error) {
+func getProviderData(providerName string, requestTimeoutInSeconds int, terraformRegistryURL, providerRepositoryURL string) (Provider, error) {
+	if providerRepositoryURL != "" {
+		log.Printf("Using custom provider repository url: '%s'\n", providerRepositoryURL)
+
+		return Provider{
+			Repo:        providerRepositoryURL,
+			Description: "Custom provider url",
+		}, nil
+	}
+
 	url := terraformRegistryURL + providerName
+	log.Printf("Getting provider data from %s\n", url)
 
 	client := &http.Client{Timeout: time.Second * time.Duration(float64(requestTimeoutInSeconds))}
 	ctx := context.Background()
@@ -108,6 +118,10 @@ func getProviderData(providerName string, requestTimeoutInSeconds int, terraform
 		return Provider{}, fmt.Errorf("could not parse JSON %w", err)
 	}
 
+	if data.Repo == "" {
+		return Provider{}, fmt.Errorf("parsed JSON but repo could no be determined. Got json '%s' from url: '%s'", body, url)
+	}
+
 	return data, nil
 }
 
@@ -130,13 +144,15 @@ func checkoutSourceCode(baseDir string, gitURL string, version string) string {
 	var r *git.Repository
 
 	repoDir := extractRepoNameFromURL(gitURL)
+	log.Printf("Extracted repo %s to %s", gitURL, repoDir)
 	fullPath := baseDir + "/" + repoDir
 
 	if !isDirExistent(fullPath) {
-		logrus.Infof("Cloning %s to %s", gitURL, fullPath)
+		log.Printf("Cloning %s to %s", gitURL, fullPath)
 		cloneRepo(gitURL, fullPath)
 	}
 
+	logrus.Infof("Plain open %s", fullPath)
 	r, err := git.PlainOpen(fullPath)
 	CheckIfError(err)
 
@@ -144,7 +160,7 @@ func checkoutSourceCode(baseDir string, gitURL string, version string) string {
 	CheckIfError(err)
 
 	// Clean the repository
-	logrus.Infof("Resetting %s and pulling latest changes", fullPath)
+	log.Printf("Resetting %s and pulling latest changes", fullPath)
 
 	err = w.Reset(&git.ResetOptions{Mode: git.HardReset})
 	CheckIfError(err)
@@ -320,7 +336,7 @@ func (a *App) Install(providerName string, version string, customBuildCommand st
 		logrus.Fatalf("Error while trying to get provider data from terraform registry: %v", err.Error())
 	}
 
-	logrus.Infof("Provider data: %v", providerData)
+	log.Printf("Provider data: %v\n", providerData)
 
 	gitRepo := providerData.Repo
 
