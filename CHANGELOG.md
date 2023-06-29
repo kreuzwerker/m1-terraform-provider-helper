@@ -1,4 +1,11 @@
 
+<a name="0.9.0"></a>
+## [0.9.0] - 2023-06-29
+### bug fixes
+- goreleaser archive name template ([#146](https://github.com/kreuzwerker/m1-terraform-provider-helper/issues/146)) ([9691117](https://github.com/kreuzwerker/m1-terraform-provider-helper/commit/969111724ac2daa42f2c8a4161b7ed1d89d7c5be))
+- empty reponse on provider registry json ([#145](https://github.com/kreuzwerker/m1-terraform-provider-helper/issues/145)) ([3eb420a](https://github.com/kreuzwerker/m1-terraform-provider-helper/commit/3eb420ad21eae08d2e52628e7cedf267d89cf680))
+
+
 <a name="0.8.2"></a>
 ## [0.8.2] - 2023-03-15
 ### bug fixes
