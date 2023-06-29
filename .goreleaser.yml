@@ -15,8 +15,10 @@ builds:
     main: ./cmd/m1-terraform-provider-helper
   
 archives:
-  - replacements:
-      darwin: Darwin
+  - name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_
+      {{- if eq .Os "darwin" }}Darwin
+      {{- else }}{{ .Os }}{{ end }}_{{ .Arch }}
 checksum:
   name_template: 'checksums.txt'
 snapshot:
