@@ -3,6 +3,7 @@ module github.com/kreuzwerker/m1-terraform-provider-helper
 go 1.19
 
 require (
+	github.com/adrg/xdg v0.4.0
 	github.com/go-git/go-git/v5 v5.7.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/hashicorp/hcl/v2 v2.17.0

@@ -29,12 +29,9 @@ type Config struct {
 }
 
 const (
-	DefaultProvidersCacheDir        = "/.m1-terraform-provider-helper"
-	DefaultTerraformPluginDir       = "/.terraform.d/plugins"
-	DefaultTerraformPluginBackupDir = "/.terraform.d/plugins_backup"
-	DefaultTerraformRegistryURL     = "https://registry.terraform.io/v1/providers/"
-	FileModePerm                    = 0777
-	DefaultRequestTimeoutInSeconds  = 10
+	DefaultTerraformRegistryURL    = "https://registry.terraform.io/v1/providers/"
+	FileModePerm                   = 0777
+	DefaultRequestTimeoutInSeconds = 10
 )
 
 func New() *App {
@@ -47,10 +44,10 @@ func New() *App {
 		Config: &Config{
 			BaseDir:                  BaseDir,
 			GoPath:                   GetCurrentGoPath(),
-			TerraformPluginDir:       BaseDir + DefaultTerraformPluginDir,
-			TerraformPluginBackupDir: BaseDir + DefaultTerraformPluginBackupDir,
-			ProvidersCacheDir:        BaseDir + DefaultProvidersCacheDir,
-			TerraformRegistryURL:     DefaultTerraformRegistryURL,
+			TerraformPluginDir:       GetTerraformPluginsPath(BaseDir),
+			TerraformPluginBackupDir: GetTerraformPluginsBackupPath(BaseDir),
+			ProvidersCacheDir:        GetProvidersCachePath(BaseDir),
+			TerraformRegistryURL:     GetTerraformRegistryURL(),
 		},
 		Out: os.Stdout,
 	}
