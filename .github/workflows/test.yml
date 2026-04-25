@@ -45,6 +45,9 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: 1.19
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.14.6"
       - name: Build a release binary
         run: |
           make build-release
