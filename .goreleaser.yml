@@ -1,3 +1,5 @@
+version: 2
+
 before:
   hooks:
     - go mod tidy
@@ -22,17 +24,18 @@ archives:
 checksum:
   name_template: 'checksums.txt'
 snapshot:
-  name_template: "{{ .Tag }}-next"
+  version_template: "{{ .Tag }}-next"
 changelog:
   sort: asc
 
-brews:
-  - tap:
+homebrew_casks:
+  - repository:
       owner: kreuzwerker
       name: homebrew-taps
       token: "{{ .Env.GORELEASER_TOKEN }}"
     dependencies:
-      - name: go
-    download_strategy: CurlDownloadStrategy
+      - formula: go
+    url:
+      using: ":homebrew_curl"
     homepage: "https://github.com/kreuzwerker/m1-terraform-provider-helper"
     description: "CLI to support with downloading and compiling terraform providers for Mac with M1 chip."
