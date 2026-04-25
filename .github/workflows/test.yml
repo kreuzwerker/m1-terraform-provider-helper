@@ -12,7 +12,7 @@ on:
       - 'README.md'
 jobs:
   unit:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -35,7 +35,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./dist/test_results/main/coverage.lcov
   integration:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -45,6 +45,9 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: 1.19
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.14.6"
       - name: Build a release binary
         run: |
           make build-release
