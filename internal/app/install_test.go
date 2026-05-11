@@ -168,14 +168,20 @@ func TestParseBuildOutputAndGetBinaryOutputPath(t *testing.T) {
 
 func TestParseIaCToolVersion(t *testing.T) {
 	t.Run("Should parse terraform version output", func(t *testing.T) {
-		version := parseIaCToolVersion("Terraform v1.2.8\non darwin_arm64")
+		version, err := parseIaCToolVersion("Terraform v1.2.8\non darwin_arm64")
+		if err != nil {
+			t.Fatalf("expected no error, but got %#v", err)
+		}
 		if version.String() != "1.2.8" {
 			t.Fatalf("expected %#v, but got %#v", "1.2.8", version.String())
 		}
 	})
 
 	t.Run("Should parse opentofu version output", func(t *testing.T) {
-		version := parseIaCToolVersion("OpenTofu v1.8.4\non darwin_arm64")
+		version, err := parseIaCToolVersion("OpenTofu v1.8.4\non darwin_arm64")
+		if err != nil {
+			t.Fatalf("expected no error, but got %#v", err)
+		}
 		if version.String() != "1.8.4" {
 			t.Fatalf("expected %#v, but got %#v", "1.8.4", version.String())
 		}
@@ -197,8 +203,15 @@ func TestGetProviderRegistryHost(t *testing.T) {
 		}
 	})
 
-	t.Run("Should fallback for invalid url", func(t *testing.T) {
+	t.Run("Should fallback for malformed registry URL", func(t *testing.T) {
 		host := getProviderRegistryHost("://bad-url")
+		if host != "registry.terraform.io" {
+			t.Fatalf("expected %#v, but got %#v", "registry.terraform.io", host)
+		}
+	})
+
+	t.Run("Should fallback for empty registry URL", func(t *testing.T) {
+		host := getProviderRegistryHost("")
 		if host != "registry.terraform.io" {
 			t.Fatalf("expected %#v, but got %#v", "registry.terraform.io", host)
 		}

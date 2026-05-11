@@ -35,6 +35,8 @@ type TerraformVersion struct {
 	Version string `json:"terraform_version"`
 }
 
+var iacToolVersionRegexp = regexp.MustCompile(`(?:Terraform|OpenTofu) v([\d.]*)`)
+
 func CheckIfError(err error) {
 	if err == nil {
 		return
@@ -324,22 +326,24 @@ func getTerraformVersion() *goversion.Version {
 	}
 
 	versionRaw := executeBashCommand(command, "./")
-	parsedVersion := parseIaCToolVersion(versionRaw)
+	parsedVersion, err := parseIaCToolVersion(versionRaw)
+	CheckIfError(err)
 
 	return parsedVersion
 }
 
-func parseIaCToolVersion(versionRaw string) *goversion.Version {
-	re := regexp.MustCompile(`(?:Terraform|OpenTofu) v([\d.]*)`)
-	find := re.FindStringSubmatch(versionRaw) // e.g. []string{"Terraform v1.1.2", "1.1.2"}
+func parseIaCToolVersion(versionRaw string) (*goversion.Version, error) {
+	find := iacToolVersionRegexp.FindStringSubmatch(versionRaw) // e.g. []string{"Terraform v1.1.2", "1.1.2"}
 	if len(find) < 2 {
-		log.Fatalf("Could not parse Terraform/OpenTofu version from output:\n%s", versionRaw)
+		return nil, fmt.Errorf("could not parse Terraform/OpenTofu version from command output")
 	}
 
 	parsedVersion, err := goversion.NewVersion(find[1])
-	CheckIfError(err)
+	if err != nil {
+		return nil, err
+	}
 
-	return parsedVersion
+	return parsedVersion, nil
 }
 
 func getProviderRegistryHost(registryURL string) string {
