@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"regexp"
@@ -297,11 +298,12 @@ func (a *App) createDestinationAndReturnExecutablePath(providerName string, vers
 	oldTfVersion, _ := goversion.NewVersion("0.12.31")
 	currentTfVersion := getTerraformVersion()
 	logrus.Infof("Installed Terraform version: %s", currentTfVersion)
+	providerRegistryHost := getProviderRegistryHost(a.Config.TerraformRegistryURL)
 
 	var newPath string
 
 	if currentTfVersion.GreaterThan(oldTfVersion) {
-		filePath := a.Config.TerraformPluginDir + "/registry.terraform.io/" + providerName + "/" + version + "/darwin_arm64"
+		filePath := a.Config.TerraformPluginDir + "/" + providerRegistryHost + "/" + providerName + "/" + version + "/darwin_arm64"
 		createDirIfNotExists(filePath)
 
 		newPath = filePath + "/" + executableName + "_" + version + "_x5"
@@ -316,15 +318,37 @@ func (a *App) createDestinationAndReturnExecutablePath(providerName string, vers
 }
 
 func getTerraformVersion() *goversion.Version {
-	versionRaw := executeBashCommand("terraform version", "./")
-	re := regexp.MustCompile(`Terraform v([\d.]*)`)
+	command := "terraform version"
+	if _, err := exec.LookPath("terraform"); err != nil {
+		command = "tofu version"
+	}
 
-	find := re.FindStringSubmatch(versionRaw) // returns object of []string{"Terraform v1.1.2", "1.1.2"}
+	versionRaw := executeBashCommand(command, "./")
+	parsedVersion := parseIaCToolVersion(versionRaw)
+
+	return parsedVersion
+}
+
+func parseIaCToolVersion(versionRaw string) *goversion.Version {
+	re := regexp.MustCompile(`(?:Terraform|OpenTofu) v([\d.]*)`)
+	find := re.FindStringSubmatch(versionRaw) // e.g. []string{"Terraform v1.1.2", "1.1.2"}
+	if len(find) < 2 {
+		log.Fatalf("Could not parse Terraform/OpenTofu version from output:\n%s", versionRaw)
+	}
 
 	parsedVersion, err := goversion.NewVersion(find[1])
 	CheckIfError(err)
 
 	return parsedVersion
+}
+
+func getProviderRegistryHost(registryURL string) string {
+	parsedURL, err := url.Parse(registryURL)
+	if err != nil || parsedURL.Host == "" {
+		return "registry.terraform.io"
+	}
+
+	return parsedURL.Host
 }
 
 func (a *App) Install(providerName string, version string, customBuildCommand string) bool {

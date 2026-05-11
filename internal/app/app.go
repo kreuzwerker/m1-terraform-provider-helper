@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -32,7 +33,10 @@ const (
 	DefaultProvidersCacheDir        = "/.m1-terraform-provider-helper"
 	DefaultTerraformPluginDir       = "/.terraform.d/plugins"
 	DefaultTerraformPluginBackupDir = "/.terraform.d/plugins_backup"
+	DefaultOpenTofuPluginDir        = "/.tofu.d/plugins"
+	DefaultOpenTofuPluginBackupDir  = "/.tofu.d/plugins_backup"
 	DefaultTerraformRegistryURL     = "https://registry.terraform.io/v1/providers/"
+	DefaultOpenTofuRegistryURL      = "https://registry.opentofu.org/v1/providers/"
 	FileModePerm                    = 0777
 	DefaultRequestTimeoutInSeconds  = 10
 )
@@ -47,10 +51,10 @@ func New() *App {
 		Config: &Config{
 			BaseDir:                  BaseDir,
 			GoPath:                   GetCurrentGoPath(),
-			TerraformPluginDir:       BaseDir + DefaultTerraformPluginDir,
-			TerraformPluginBackupDir: BaseDir + DefaultTerraformPluginBackupDir,
+			TerraformPluginDir:       BaseDir + getDefaultPluginDir(),
+			TerraformPluginBackupDir: BaseDir + getDefaultPluginBackupDir(),
 			ProvidersCacheDir:        BaseDir + DefaultProvidersCacheDir,
-			TerraformRegistryURL:     DefaultTerraformRegistryURL,
+			TerraformRegistryURL:     getDefaultRegistryURL(),
 		},
 		Out: os.Stdout,
 	}
@@ -68,6 +72,40 @@ func New() *App {
 	app.Config.RequestTimeoutInSeconds = value
 
 	return app
+}
+
+func isTofuEnvironment() bool {
+	if _, err := exec.LookPath("terraform"); err == nil {
+		return false
+	}
+
+	_, err := exec.LookPath("tofu")
+
+	return err == nil
+}
+
+func getDefaultPluginDir() string {
+	if isTofuEnvironment() {
+		return DefaultOpenTofuPluginDir
+	}
+
+	return DefaultTerraformPluginDir
+}
+
+func getDefaultPluginBackupDir() string {
+	if isTofuEnvironment() {
+		return DefaultOpenTofuPluginBackupDir
+	}
+
+	return DefaultTerraformPluginBackupDir
+}
+
+func getDefaultRegistryURL() string {
+	if isTofuEnvironment() {
+		return DefaultOpenTofuRegistryURL
+	}
+
+	return DefaultTerraformRegistryURL
 }
 
 func (a *App) Init() {

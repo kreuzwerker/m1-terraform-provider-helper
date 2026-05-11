@@ -13,7 +13,7 @@
 [![Lint Status](https://github.com/kreuzwerker/m1-terraform-provider-helper/workflows/golangci-lint/badge.svg)](https://github.com/kreuzwerker/m1-terraform-provider-helper/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/kreuzwerker/m1-terraform-provider-helper)](https://goreportcard.com/report/github.com/kreuzwerker/m1-terraform-provider-helper)
 
-A CLI to manage the installation and compilation of Terraform providers for an ARM-based Mac.
+A CLI to manage the installation and compilation of Terraform/OpenTofu providers for an ARM-based Mac.
 
 ## Table of Contents
 
@@ -63,7 +63,7 @@ binary in your PATH.) Ensure that the command `go version` succeeds before using
 ## Usage
 
 ```
-A CLI to manage the installation of Terraform providers for an ARM-based Mac
+A CLI to manage the installation of Terraform/OpenTofu providers for an ARM-based Mac
 
 Usage:
   m1-terraform-provider-helper [command]
@@ -92,6 +92,8 @@ You want to install version `v2.10.0` of `terraform-provider-vault` because you'
 m1-terraform-provider-helper activate # (In case you have not activated the helper)
 m1-terraform-provider-helper install hashicorp/vault -v v2.10.0 # Install and compile
 ```
+
+If `terraform` is not installed but `tofu` is available, the helper will automatically use OpenTofu defaults (`~/.tofu.d/plugins` and `https://registry.opentofu.org/v1/providers/`).
 
 ### Debugging Installation Problems
 

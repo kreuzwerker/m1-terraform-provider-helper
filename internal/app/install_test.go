@@ -165,3 +165,42 @@ func TestParseBuildOutputAndGetBinaryOutputPath(t *testing.T) {
 		}
 	})
 }
+
+func TestParseIaCToolVersion(t *testing.T) {
+	t.Run("Should parse terraform version output", func(t *testing.T) {
+		version := parseIaCToolVersion("Terraform v1.2.8\non darwin_arm64")
+		if version.String() != "1.2.8" {
+			t.Fatalf("expected %#v, but got %#v", "1.2.8", version.String())
+		}
+	})
+
+	t.Run("Should parse opentofu version output", func(t *testing.T) {
+		version := parseIaCToolVersion("OpenTofu v1.8.4\non darwin_arm64")
+		if version.String() != "1.8.4" {
+			t.Fatalf("expected %#v, but got %#v", "1.8.4", version.String())
+		}
+	})
+}
+
+func TestGetProviderRegistryHost(t *testing.T) {
+	t.Run("Should parse Terraform registry host", func(t *testing.T) {
+		host := getProviderRegistryHost("https://registry.terraform.io/v1/providers/")
+		if host != "registry.terraform.io" {
+			t.Fatalf("expected %#v, but got %#v", "registry.terraform.io", host)
+		}
+	})
+
+	t.Run("Should parse OpenTofu registry host", func(t *testing.T) {
+		host := getProviderRegistryHost("https://registry.opentofu.org/v1/providers/")
+		if host != "registry.opentofu.org" {
+			t.Fatalf("expected %#v, but got %#v", "registry.opentofu.org", host)
+		}
+	})
+
+	t.Run("Should fallback for invalid url", func(t *testing.T) {
+		host := getProviderRegistryHost("://bad-url")
+		if host != "registry.terraform.io" {
+			t.Fatalf("expected %#v, but got %#v", "registry.terraform.io", host)
+		}
+	})
+}
