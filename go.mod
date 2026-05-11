@@ -9,7 +9,7 @@ require (
 	github.com/jarcoal/httpmock v1.4.1
 	github.com/spf13/cobra v1.10.2
 	github.com/zclconf/go-cty v1.18.1
-	golang.org/x/mod v0.35.0
+	golang.org/x/mod v0.36.0
 )
 
 require (
@@ -22,7 +22,7 @@ require (
 	github.com/pjbgf/sha1cd v0.6.0 // indirect
 	github.com/skeema/knownhosts v1.3.1 // indirect
 	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/tools v0.43.0 // indirect
+	golang.org/x/tools v0.44.0 // indirect
 )
 
 require (
