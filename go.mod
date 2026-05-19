@@ -3,7 +3,7 @@ module github.com/kreuzwerker/m1-terraform-provider-helper
 go 1.25.0
 
 require (
-	github.com/go-git/go-git/v5 v5.19.0
+	github.com/go-git/go-git/v5 v5.19.1
 	github.com/hashicorp/go-version v1.9.0
 	github.com/hashicorp/hcl/v2 v2.24.0
 	github.com/jarcoal/httpmock v1.4.1
@@ -28,14 +28,11 @@ require (
 require (
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.1.6 // indirect
-	github.com/acomagu/bufpipe v1.0.4 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
-	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.9.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/imdario/mergo v0.3.15 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
