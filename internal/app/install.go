@@ -298,8 +298,8 @@ func parseBuildOutputAndGetBinaryOutputPath(buildOutput string) (string, bool) {
 
 func (a *App) createDestinationAndReturnExecutablePath(providerName string, version string, executableName string) string {
 	oldTfVersion, _ := goversion.NewVersion("0.12.31")
-	currentTfVersion := getTerraformVersion()
-	logrus.Infof("Installed Terraform version: %s", currentTfVersion)
+	currentTfVersion := getIaCToolVersion(a.Config.IaCToolBinary)
+	logrus.Infof("Installed IaC tool version: %s", currentTfVersion)
 	providerRegistryHost := getProviderRegistryHost(a.Config.TerraformRegistryURL)
 
 	var newPath string
@@ -319,13 +319,8 @@ func (a *App) createDestinationAndReturnExecutablePath(providerName string, vers
 	return newPath
 }
 
-func getTerraformVersion() *goversion.Version {
-	command := "terraform version"
-	if _, err := exec.LookPath("terraform"); err != nil {
-		command = "tofu version"
-	}
-
-	versionRaw := executeBashCommand(command, "./")
+func getIaCToolVersion(iacToolBinary string) *goversion.Version {
+	versionRaw := executeBashCommand(getIaCToolCommandName(iacToolBinary)+" version", "./")
 	parsedVersion, err := parseIaCToolVersion(versionRaw)
 	CheckIfError(err)
 

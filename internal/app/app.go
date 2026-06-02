@@ -27,6 +27,7 @@ type Config struct {
 	TerraformRegistryURL     string
 	ProviderRepositoryURL    string
 	RequestTimeoutInSeconds  int
+	IaCToolBinary            string
 }
 
 const (
@@ -39,22 +40,33 @@ const (
 	DefaultOpenTofuRegistryURL      = "https://registry.opentofu.org/v1/providers/"
 	FileModePerm                    = 0777
 	DefaultRequestTimeoutInSeconds  = 10
+	DefaultIaCToolBinary            = "auto"
+	IaCToolTerraform                = "terraform"
+	IaCToolOpenTofu                 = "opentofu"
+	IaCToolOpenTofuCommand          = "tofu"
 )
 
-func New() *App {
+func New(iacToolBinary ...string) *App {
 	BaseDir, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	selectedIaCTool := DefaultIaCToolBinary
+	if len(iacToolBinary) > 0 && iacToolBinary[0] != "" {
+		selectedIaCTool = iacToolBinary[0]
+	}
+	resolvedIaCTool := resolveIaCToolBinary(selectedIaCTool, execLookPath)
+
 	app := &App{
 		Config: &Config{
 			BaseDir:                  BaseDir,
 			GoPath:                   GetCurrentGoPath(),
-			TerraformPluginDir:       BaseDir + getDefaultPluginDir(),
-			TerraformPluginBackupDir: BaseDir + getDefaultPluginBackupDir(),
+			TerraformPluginDir:       BaseDir + getDefaultPluginDir(resolvedIaCTool),
+			TerraformPluginBackupDir: BaseDir + getDefaultPluginBackupDir(resolvedIaCTool),
 			ProvidersCacheDir:        BaseDir + DefaultProvidersCacheDir,
-			TerraformRegistryURL:     getDefaultRegistryURL(),
+			TerraformRegistryURL:     getDefaultRegistryURL(resolvedIaCTool),
+			IaCToolBinary:            resolvedIaCTool,
 		},
 		Out: os.Stdout,
 	}
@@ -74,34 +86,55 @@ func New() *App {
 	return app
 }
 
-func isTofuEnvironment() bool {
-	if _, err := exec.LookPath("terraform"); err == nil {
-		return false
-	}
-
-	_, err := exec.LookPath("tofu")
-
-	return err == nil
+var execLookPath = func(file string) (string, error) {
+	return exec.LookPath(file)
 }
 
-func getDefaultPluginDir() string {
-	if isTofuEnvironment() {
+func resolveIaCToolBinary(selected string, lookPath func(string) (string, error)) string {
+	switch selected {
+	case "", DefaultIaCToolBinary:
+		if _, err := lookPath(IaCToolTerraform); err == nil {
+			return IaCToolTerraform
+		}
+
+		if _, err := lookPath(IaCToolOpenTofuCommand); err == nil {
+			return IaCToolOpenTofu
+		}
+
+		return IaCToolTerraform
+	case IaCToolTerraform, IaCToolOpenTofu:
+		return selected
+	default:
+		return selected
+	}
+}
+
+func getIaCToolCommandName(iacToolBinary string) string {
+	if iacToolBinary == IaCToolOpenTofu {
+		return IaCToolOpenTofuCommand
+	}
+
+	return IaCToolTerraform
+}
+
+func getDefaultPluginDir(iacToolBinary string) string {
+	if iacToolBinary == IaCToolOpenTofu {
 		return DefaultOpenTofuPluginDir
 	}
 
 	return DefaultTerraformPluginDir
 }
 
-func getDefaultPluginBackupDir() string {
-	if isTofuEnvironment() {
+func getDefaultPluginBackupDir(iacToolBinary string) string {
+	if iacToolBinary == IaCToolOpenTofu {
 		return DefaultOpenTofuPluginBackupDir
 	}
 
 	return DefaultTerraformPluginBackupDir
 }
 
-func getDefaultRegistryURL() string {
-	if isTofuEnvironment() {
+func getDefaultRegistryURL(iacToolBinary string) string {
+	if iacToolBinary == IaCToolOpenTofu {
 		return DefaultOpenTofuRegistryURL
 	}
 

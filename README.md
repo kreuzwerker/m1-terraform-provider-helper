@@ -73,7 +73,7 @@ Available Commands:
   completion  Generate the autocompletion script for the specified shell
   deactivate  Deactivate the m1-terraform-provider-helper
   help        Help about any command
-  install     Download (and compile) a Terraform provider for an ARM-based Mac
+  install     Download (and compile) a Terraform/OpenTofu provider for an ARM-based Mac
   list        List all available providers and their versions
   lockfile    Commands to work with Terraform lockfiles
   status      Show the status of the m1-terraform-provider-helper installation
@@ -92,6 +92,8 @@ You want to install version `v2.10.0` of `terraform-provider-vault` because you'
 m1-terraform-provider-helper activate # (In case you have not activated the helper)
 m1-terraform-provider-helper install hashicorp/vault -v v2.10.0 # Install and compile
 ```
+
+By default, the helper auto-detects the available binary. If both are installed it prefers `terraform`. You can override this with `--iac-tool terraform` or `--iac-tool opentofu`.
 
 If `terraform` is not installed but `tofu` is available, the helper will automatically use OpenTofu defaults (`~/.tofu.d/plugins` and `https://registry.opentofu.org/v1/providers/`).
 
@@ -155,7 +157,7 @@ The `m1-terraform-provider-helper` does make HTTP calls to the terraform provide
 
 ### Plugin Directory
 
-The destination and name of the compiled provider depends on the terraform version:
+The destination and name of the compiled provider depends on the selected IaC tool and its version:
 
 * For Terraform `<0.13` it is `~/.terraform.d/plugins/darwin_arm64/terraform-provider-template_v2.2.0` (based on https://developer.hashicorp.com/terraform/language/v1.1.x/configuration-0-11/providers#plugin-names-and-versions)
 * For all Terraform versions `>=0.13` it is `~/.terraform.d/plugins/registry.terraform.io/${providerName}/${version}/darwin_arm64/terraform-provider-template_2.2.0_x5` (based on https://developer.hashicorp.com/terraform/cli/config/config-file#implied-local-mirror-directories)
