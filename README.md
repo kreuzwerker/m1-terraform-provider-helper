@@ -93,7 +93,7 @@ m1-terraform-provider-helper activate # (In case you have not activated the help
 m1-terraform-provider-helper install hashicorp/vault -v v2.10.0 # Install and compile
 ```
 
-By default, the helper auto-detects the available binary. If both are installed it prefers `terraform`. You can override this with `--iac-tool terraform` or `--iac-tool opentofu`.
+By default, the helper auto-detects the available binary. If both are installed it prefers `terraform`. You can override this with `--iac-tool terraform` or `--iac-tool tofu`.
 
 If `terraform` is not installed but `tofu` is available, the helper will automatically use OpenTofu defaults (`~/.tofu.d/plugins` and `https://registry.opentofu.org/v1/providers/`).
 

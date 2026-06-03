@@ -50,7 +50,7 @@ func installCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVarP(&versionString, "version", "v", "", "The version of the provider")
-	cmd.Flags().StringVar(&iaCToolBinary, "iac-tool", app.DefaultIaCToolBinary, "IaC binary to use: auto, terraform, or opentofu")
+	cmd.Flags().StringVar(&iaCToolBinary, "iac-tool", app.DefaultIaCToolBinary, "IaC binary to use: auto, terraform, or tofu")
 	cmd.Flags().StringVar(&customBuildCommand, "custom-build-command", "", "A custom build command to execute instead of the built-in commands")
 	cmd.Flags().StringVarP(&customTerraformRegistryURL, "custom-terraform-registry-url", "u", "", "A custom URL of the Terraform/OpenTofu registry")
 	cmd.Flags().StringVarP(&customProviderRepositoryURL, "custom-provider-repository-url", "p", "", "A custom URL of the provider repository")
@@ -60,7 +60,7 @@ func installCmd() *cobra.Command {
 
 func isValidIaCToolBinary(value string) bool {
 	switch value {
-	case app.DefaultIaCToolBinary, app.IaCToolTerraform, app.IaCToolOpenTofu:
+	case app.DefaultIaCToolBinary, app.IaCToolTerraform, app.IaCToolTofu:
 		return true
 	default:
 		return false

@@ -23,8 +23,8 @@ func TestResolveIaCToolBinary(t *testing.T) {
 			return "/bin/tofu", nil
 		}
 		got := resolveIaCToolBinary(DefaultIaCToolBinary, lookPath)
-		if got != IaCToolOpenTofu {
-			t.Fatalf("expected %q, got %q", IaCToolOpenTofu, got)
+		if got != IaCToolTofu {
+			t.Fatalf("expected %q, got %q", IaCToolTofu, got)
 		}
 	})
 
@@ -36,9 +36,9 @@ func TestResolveIaCToolBinary(t *testing.T) {
 	})
 
 	t.Run("should honor explicit opentofu selection", func(t *testing.T) {
-		got := resolveIaCToolBinary(IaCToolOpenTofu, func(string) (string, error) { return "", errNotFound })
-		if got != IaCToolOpenTofu {
-			t.Fatalf("expected %q, got %q", IaCToolOpenTofu, got)
+		got := resolveIaCToolBinary(IaCToolTofu, func(string) (string, error) { return "", errNotFound })
+		if got != IaCToolTofu {
+			t.Fatalf("expected %q, got %q", IaCToolTofu, got)
 		}
 	})
 }
@@ -55,9 +55,9 @@ func TestNewUsesSelectedIaCToolBinary(t *testing.T) {
 	})
 
 	t.Run("opentofu selection sets opentofu defaults", func(t *testing.T) {
-		app := New(IaCToolOpenTofu)
-		if app.Config.IaCToolBinary != IaCToolOpenTofu {
-			t.Fatalf("expected %q, got %q", IaCToolOpenTofu, app.Config.IaCToolBinary)
+		app := New(IaCToolTofu)
+		if app.Config.IaCToolBinary != IaCToolTofu {
+			t.Fatalf("expected %q, got %q", IaCToolTofu, app.Config.IaCToolBinary)
 		}
 		if app.Config.TerraformPluginDir == "" || app.Config.TerraformRegistryURL != DefaultOpenTofuRegistryURL {
 			t.Fatalf("expected opentofu defaults to be configured, got %#v", app.Config)
@@ -76,8 +76,8 @@ func TestNewUsesSelectedIaCToolBinary(t *testing.T) {
 		}
 
 		app := New()
-		if app.Config.IaCToolBinary != IaCToolOpenTofu {
-			t.Fatalf("expected %q, got %q", IaCToolOpenTofu, app.Config.IaCToolBinary)
+		if app.Config.IaCToolBinary != IaCToolTofu {
+			t.Fatalf("expected %q, got %q", IaCToolTofu, app.Config.IaCToolBinary)
 		}
 		if app.Config.TerraformRegistryURL != DefaultOpenTofuRegistryURL {
 			t.Fatalf("expected opentofu registry url, got %q", app.Config.TerraformRegistryURL)
@@ -93,8 +93,8 @@ func TestGetIaCToolCommandName(t *testing.T) {
 	})
 
 	t.Run("should map opentofu mode to tofu command", func(t *testing.T) {
-		if got := getIaCToolCommandName(IaCToolOpenTofu); got != IaCToolOpenTofuCommand {
-			t.Fatalf("expected %q, got %q", IaCToolOpenTofuCommand, got)
+		if got := getIaCToolCommandName(IaCToolTofu); got != IaCToolTofu {
+			t.Fatalf("expected %q, got %q", IaCToolTofu, got)
 		}
 	})
 }

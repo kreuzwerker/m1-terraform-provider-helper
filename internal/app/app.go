@@ -42,8 +42,7 @@ const (
 	DefaultRequestTimeoutInSeconds  = 10
 	DefaultIaCToolBinary            = "auto"
 	IaCToolTerraform                = "terraform"
-	IaCToolOpenTofu                 = "opentofu"
-	IaCToolOpenTofuCommand          = "tofu"
+	IaCToolTofu                     = "tofu"
 )
 
 func New(iacToolBinary ...string) *App {
@@ -97,12 +96,12 @@ func resolveIaCToolBinary(selected string, lookPath func(string) (string, error)
 			return IaCToolTerraform
 		}
 
-		if _, err := lookPath(IaCToolOpenTofuCommand); err == nil {
-			return IaCToolOpenTofu
+		if _, err := lookPath(IaCToolTofu); err == nil {
+			return IaCToolTofu
 		}
 
 		return IaCToolTerraform
-	case IaCToolTerraform, IaCToolOpenTofu:
+	case IaCToolTerraform, IaCToolTofu:
 		return selected
 	default:
 		return selected
@@ -110,15 +109,15 @@ func resolveIaCToolBinary(selected string, lookPath func(string) (string, error)
 }
 
 func getIaCToolCommandName(iacToolBinary string) string {
-	if iacToolBinary == IaCToolOpenTofu {
-		return IaCToolOpenTofuCommand
+	if iacToolBinary == IaCToolTofu {
+		return IaCToolTofu
 	}
 
 	return IaCToolTerraform
 }
 
 func getDefaultPluginDir(iacToolBinary string) string {
-	if iacToolBinary == IaCToolOpenTofu {
+	if iacToolBinary == IaCToolTofu {
 		return DefaultOpenTofuPluginDir
 	}
 
@@ -126,7 +125,7 @@ func getDefaultPluginDir(iacToolBinary string) string {
 }
 
 func getDefaultPluginBackupDir(iacToolBinary string) string {
-	if iacToolBinary == IaCToolOpenTofu {
+	if iacToolBinary == IaCToolTofu {
 		return DefaultOpenTofuPluginBackupDir
 	}
 
@@ -134,7 +133,7 @@ func getDefaultPluginBackupDir(iacToolBinary string) string {
 }
 
 func getDefaultRegistryURL(iacToolBinary string) string {
-	if iacToolBinary == IaCToolOpenTofu {
+	if iacToolBinary == IaCToolTofu {
 		return DefaultOpenTofuRegistryURL
 	}
 
