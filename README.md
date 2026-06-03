@@ -13,7 +13,7 @@
 [![Lint Status](https://github.com/kreuzwerker/m1-terraform-provider-helper/workflows/golangci-lint/badge.svg)](https://github.com/kreuzwerker/m1-terraform-provider-helper/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/kreuzwerker/m1-terraform-provider-helper)](https://goreportcard.com/report/github.com/kreuzwerker/m1-terraform-provider-helper)
 
-A CLI to manage the installation and compilation of Terraform providers for an ARM-based Mac.
+A CLI to manage the installation and compilation of Terraform/OpenTofu providers for an ARM-based Mac.
 
 ## Table of Contents
 
@@ -63,7 +63,7 @@ binary in your PATH.) Ensure that the command `go version` succeeds before using
 ## Usage
 
 ```
-A CLI to manage the installation of Terraform providers for an ARM-based Mac
+A CLI to manage the installation of Terraform/OpenTofu providers for an ARM-based Mac
 
 Usage:
   m1-terraform-provider-helper [command]
@@ -73,7 +73,7 @@ Available Commands:
   completion  Generate the autocompletion script for the specified shell
   deactivate  Deactivate the m1-terraform-provider-helper
   help        Help about any command
-  install     Download (and compile) a Terraform provider for an ARM-based Mac
+  install     Download (and compile) a Terraform/OpenTofu provider for an ARM-based Mac
   list        List all available providers and their versions
   lockfile    Commands to work with Terraform lockfiles
   status      Show the status of the m1-terraform-provider-helper installation
@@ -92,6 +92,10 @@ You want to install version `v2.10.0` of `terraform-provider-vault` because you'
 m1-terraform-provider-helper activate # (In case you have not activated the helper)
 m1-terraform-provider-helper install hashicorp/vault -v v2.10.0 # Install and compile
 ```
+
+By default, the helper auto-detects the available binary. If both are installed it prefers `terraform`. You can override this with `--iac-tool terraform` or `--iac-tool tofu`.
+
+If `terraform` is not installed but `tofu` is available, the helper will automatically use OpenTofu defaults (`~/.tofu.d/plugins` and `https://registry.opentofu.org/v1/providers/`).
 
 ### Debugging Installation Problems
 
@@ -153,7 +157,7 @@ The `m1-terraform-provider-helper` does make HTTP calls to the terraform provide
 
 ### Plugin Directory
 
-The destination and name of the compiled provider depends on the terraform version:
+The destination and name of the compiled provider depends on the selected IaC tool and its version:
 
 * For Terraform `<0.13` it is `~/.terraform.d/plugins/darwin_arm64/terraform-provider-template_v2.2.0` (based on https://developer.hashicorp.com/terraform/language/v1.1.x/configuration-0-11/providers#plugin-names-and-versions)
 * For all Terraform versions `>=0.13` it is `~/.terraform.d/plugins/registry.terraform.io/${providerName}/${version}/darwin_arm64/terraform-provider-template_2.2.0_x5` (based on https://developer.hashicorp.com/terraform/cli/config/config-file#implied-local-mirror-directories)

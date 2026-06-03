@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -26,31 +27,45 @@ type Config struct {
 	TerraformRegistryURL     string
 	ProviderRepositoryURL    string
 	RequestTimeoutInSeconds  int
+	IaCToolBinary            string
 }
 
 const (
 	DefaultProvidersCacheDir        = "/.m1-terraform-provider-helper"
 	DefaultTerraformPluginDir       = "/.terraform.d/plugins"
 	DefaultTerraformPluginBackupDir = "/.terraform.d/plugins_backup"
+	DefaultOpenTofuPluginDir        = "/.tofu.d/plugins"
+	DefaultOpenTofuPluginBackupDir  = "/.tofu.d/plugins_backup"
 	DefaultTerraformRegistryURL     = "https://registry.terraform.io/v1/providers/"
+	DefaultOpenTofuRegistryURL      = "https://registry.opentofu.org/v1/providers/"
 	FileModePerm                    = 0777
 	DefaultRequestTimeoutInSeconds  = 10
+	DefaultIaCToolBinary            = "auto"
+	IaCToolTerraform                = "terraform"
+	IaCToolTofu                     = "tofu"
 )
 
-func New() *App {
+func New(iacToolBinary ...string) *App {
 	BaseDir, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	selectedIaCTool := DefaultIaCToolBinary
+	if len(iacToolBinary) > 0 && iacToolBinary[0] != "" {
+		selectedIaCTool = iacToolBinary[0]
+	}
+	resolvedIaCTool := resolveIaCToolBinary(selectedIaCTool, execLookPath)
+
 	app := &App{
 		Config: &Config{
 			BaseDir:                  BaseDir,
 			GoPath:                   GetCurrentGoPath(),
-			TerraformPluginDir:       BaseDir + DefaultTerraformPluginDir,
-			TerraformPluginBackupDir: BaseDir + DefaultTerraformPluginBackupDir,
+			TerraformPluginDir:       BaseDir + getDefaultPluginDir(resolvedIaCTool),
+			TerraformPluginBackupDir: BaseDir + getDefaultPluginBackupDir(resolvedIaCTool),
 			ProvidersCacheDir:        BaseDir + DefaultProvidersCacheDir,
-			TerraformRegistryURL:     DefaultTerraformRegistryURL,
+			TerraformRegistryURL:     getDefaultRegistryURL(resolvedIaCTool),
+			IaCToolBinary:            resolvedIaCTool,
 		},
 		Out: os.Stdout,
 	}
@@ -68,6 +83,61 @@ func New() *App {
 	app.Config.RequestTimeoutInSeconds = value
 
 	return app
+}
+
+var execLookPath = func(file string) (string, error) {
+	return exec.LookPath(file)
+}
+
+func resolveIaCToolBinary(selected string, lookPath func(string) (string, error)) string {
+	switch selected {
+	case "", DefaultIaCToolBinary:
+		if _, err := lookPath(IaCToolTerraform); err == nil {
+			return IaCToolTerraform
+		}
+
+		if _, err := lookPath(IaCToolTofu); err == nil {
+			return IaCToolTofu
+		}
+
+		return IaCToolTerraform
+	case IaCToolTerraform, IaCToolTofu:
+		return selected
+	default:
+		return selected
+	}
+}
+
+func getIaCToolCommandName(iacToolBinary string) string {
+	if iacToolBinary == IaCToolTofu {
+		return IaCToolTofu
+	}
+
+	return IaCToolTerraform
+}
+
+func getDefaultPluginDir(iacToolBinary string) string {
+	if iacToolBinary == IaCToolTofu {
+		return DefaultOpenTofuPluginDir
+	}
+
+	return DefaultTerraformPluginDir
+}
+
+func getDefaultPluginBackupDir(iacToolBinary string) string {
+	if iacToolBinary == IaCToolTofu {
+		return DefaultOpenTofuPluginBackupDir
+	}
+
+	return DefaultTerraformPluginBackupDir
+}
+
+func getDefaultRegistryURL(iacToolBinary string) string {
+	if iacToolBinary == IaCToolTofu {
+		return DefaultOpenTofuRegistryURL
+	}
+
+	return DefaultTerraformRegistryURL
 }
 
 func (a *App) Init() {

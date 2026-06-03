@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"regexp"
@@ -33,6 +34,8 @@ type BuildCommandInformation struct {
 type TerraformVersion struct {
 	Version string `json:"terraform_version"`
 }
+
+var iacToolVersionRegexp = regexp.MustCompile(`(?:Terraform|OpenTofu) v([\d.]*)`)
 
 func CheckIfError(err error) {
 	if err == nil {
@@ -295,13 +298,14 @@ func parseBuildOutputAndGetBinaryOutputPath(buildOutput string) (string, bool) {
 
 func (a *App) createDestinationAndReturnExecutablePath(providerName string, version string, executableName string) string {
 	oldTfVersion, _ := goversion.NewVersion("0.12.31")
-	currentTfVersion := getTerraformVersion()
-	logrus.Infof("Installed Terraform version: %s", currentTfVersion)
+	currentTfVersion := getIaCToolVersion(a.Config.IaCToolBinary)
+	logrus.Infof("Installed IaC tool version: %s", currentTfVersion)
+	providerRegistryHost := getProviderRegistryHost(a.Config.TerraformRegistryURL)
 
 	var newPath string
 
 	if currentTfVersion.GreaterThan(oldTfVersion) {
-		filePath := a.Config.TerraformPluginDir + "/registry.terraform.io/" + providerName + "/" + version + "/darwin_arm64"
+		filePath := a.Config.TerraformPluginDir + "/" + providerRegistryHost + "/" + providerName + "/" + version + "/darwin_arm64"
 		createDirIfNotExists(filePath)
 
 		newPath = filePath + "/" + executableName + "_" + version + "_x5"
@@ -315,16 +319,35 @@ func (a *App) createDestinationAndReturnExecutablePath(providerName string, vers
 	return newPath
 }
 
-func getTerraformVersion() *goversion.Version {
-	versionRaw := executeBashCommand("terraform version", "./")
-	re := regexp.MustCompile(`Terraform v([\d.]*)`)
-
-	find := re.FindStringSubmatch(versionRaw) // returns object of []string{"Terraform v1.1.2", "1.1.2"}
-
-	parsedVersion, err := goversion.NewVersion(find[1])
+func getIaCToolVersion(iacToolBinary string) *goversion.Version {
+	versionRaw := executeBashCommand(getIaCToolCommandName(iacToolBinary)+" version", "./")
+	parsedVersion, err := parseIaCToolVersion(versionRaw)
 	CheckIfError(err)
 
 	return parsedVersion
+}
+
+func parseIaCToolVersion(versionRaw string) (*goversion.Version, error) {
+	find := iacToolVersionRegexp.FindStringSubmatch(versionRaw) // e.g. []string{"Terraform v1.1.2", "1.1.2"}
+	if len(find) < 2 {
+		return nil, fmt.Errorf("could not parse Terraform/OpenTofu version from command output")
+	}
+
+	parsedVersion, err := goversion.NewVersion(find[1])
+	if err != nil {
+		return nil, err
+	}
+
+	return parsedVersion, nil
+}
+
+func getProviderRegistryHost(registryURL string) string {
+	parsedURL, err := url.Parse(registryURL)
+	if err != nil || parsedURL.Host == "" {
+		return "registry.terraform.io"
+	}
+
+	return parsedURL.Host
 }
 
 func (a *App) Install(providerName string, version string, customBuildCommand string) bool {
