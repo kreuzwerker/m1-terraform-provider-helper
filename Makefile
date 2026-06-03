@@ -26,7 +26,7 @@ endif
 
 # Dependency versions
 GOTESTSUM_VERSION = 1.8.1
-GOLANGCI_VERSION = 1.49.0
+GOLANGCI_VERSION = 2.11.4
 GITCHGLOG_VERSION = 0.15.1
 SVU_VERSION = 1.9.0
 
@@ -159,22 +159,22 @@ endif
 
 .PHONY: patch
 patch: ## Release a new patch version
-	@${MAKE} replace-occurences-$(shell (svu --strip-prefix patch))
-	@${MAKE} release-$(shell (svu --strip-prefix patch))
+	@${MAKE} replace-occurences-$(shell (svu --tag.prefix='' patch))
+	@${MAKE} release-$(shell (svu --tag.prefix='' patch))
 
 .PHONY: minor
 minor: ## Release a new minor version
-	@${MAKE} replace-occurences-$(shell (svu --strip-prefix minor))
-	@${MAKE} release-$(shell (svu --strip-prefix minor))
+	@${MAKE} replace-occurences-$(shell (svu minor --tag.prefix=''))
+	@${MAKE} release-$(shell (svu minor --tag.prefix=''))
 
 .PHONY: major
 major: ## Release a new major version
-	@${MAKE} replace-occurences-$(shell (svu --strip-prefix major))
-	@${MAKE} release-$(shell (svu --strip-prefix major))
+	@${MAKE} replace-occurences-$(shell (svu --tag.prefix='' major))
+	@${MAKE} release-$(shell (svu --tag.prefix='' major))
 
 replace-occurences-%:
 	@echo "Replace occurences of old version strings..."
-	sed -i '' "s/$(shell (svu --strip-prefix current))/$*/g" cmd/version.go
+	sed -i '' "s/$(shell (svu current --tag.prefix='' ))/$*/g" cmd/version.go
 
 .PHONY: list
 list: ## List all make targets

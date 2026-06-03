@@ -1,4 +1,13 @@
 
+<a name="0.10.0"></a>
+## [0.10.0] - 2026-06-03
+### features
+- add CLI flag to use tofu as iac tool ([d76cc97](https://github.com/kreuzwerker/m1-terraform-provider-helper/commit/d76cc9797ee31528b609927091c160628eea049b))
+
+
+<a name="v0.9.1"></a>
+## [v0.9.1] - 2026-04-25
+
 <a name="0.9.0"></a>
 ## [0.9.0] - 2023-06-29
 ### bug fixes
