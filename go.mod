@@ -8,13 +8,14 @@ require (
 	github.com/hashicorp/hcl/v2 v2.24.0
 	github.com/jarcoal/httpmock v1.4.1
 	github.com/spf13/cobra v1.10.2
-	github.com/zclconf/go-cty v1.18.1
+	github.com/zclconf/go-cty v1.19.0
 	golang.org/x/mod v0.36.0
 )
 
 require (
 	dario.cat/mergo v1.0.0 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
+	github.com/apparentlymart/go-textseg/v17 v17.0.1 // indirect
 	github.com/cloudflare/circl v1.6.3 // indirect
 	github.com/cyphar/filepath-securejoin v0.6.1 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
