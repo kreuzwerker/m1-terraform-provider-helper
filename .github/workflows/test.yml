@@ -21,7 +21,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v7
         with:
-          go-version: 1.26
+          go-version: 1.27
       - name: Run tests
         run: make test
       - name: Convert coverage
@@ -44,7 +44,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v7
         with:
-          go-version: 1.26
+          go-version: 1.27
       - uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "1.14.6"
