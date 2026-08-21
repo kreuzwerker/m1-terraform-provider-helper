@@ -194,7 +194,6 @@ func TestGetProviderRegistryHost(t *testing.T) {
 		if host != "registry.terraform.io" {
 			t.Fatalf("expected %#v, but got %#v", "registry.terraform.io", host)
 		}
-
 	})
 
 	t.Run("Should parse OpenTofu registry host", func(t *testing.T) {
