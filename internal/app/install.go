@@ -308,7 +308,7 @@ func (a *App) createDestinationAndReturnExecutablePath(providerName string, vers
 		filePath := a.Config.TerraformPluginDir + "/" + providerRegistryHost + "/" + providerName + "/" + version + "/darwin_arm64"
 		createDirIfNotExists(filePath)
 
-		newPath = filePath + "/" + executableName + "_" + version + "_x5"
+		newPath = filePath + "/" + executableName + "_" + getProviderVersionPrefix(a.Config.IaCToolBinary) + version + "_x5"
 	} else {
 		// before 0.12.31 it is: ~/.terraform.d/plugins/darwin_arm64/terraform-provider-template_v2.2.0
 		filePath := a.Config.TerraformPluginDir + "/darwin_arm64"
@@ -317,6 +317,14 @@ func (a *App) createDestinationAndReturnExecutablePath(providerName string, vers
 	}
 
 	return newPath
+}
+
+func getProviderVersionPrefix(iacToolBinary string) string {
+	if iacToolBinary == IaCToolTofu {
+		return "v"
+	}
+
+	return ""
 }
 
 func getIaCToolVersion(iacToolBinary string) *goversion.Version {
