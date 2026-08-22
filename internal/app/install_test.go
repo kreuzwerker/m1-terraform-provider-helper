@@ -217,3 +217,17 @@ func TestGetProviderRegistryHost(t *testing.T) {
 		}
 	})
 }
+
+func TestGetProviderVersionPrefix(t *testing.T) {
+	t.Run("Terraform provider filenames do not use a version prefix", func(t *testing.T) {
+		if got := getProviderVersionPrefix(IaCToolTerraform); got != "" {
+			t.Fatalf("expected no version prefix, got %q", got)
+		}
+	})
+
+	t.Run("OpenTofu provider filenames use a v version prefix", func(t *testing.T) {
+		if got := getProviderVersionPrefix(IaCToolTofu); got != "v" {
+			t.Fatalf("expected %q version prefix, got %q", "v", got)
+		}
+	})
+}
