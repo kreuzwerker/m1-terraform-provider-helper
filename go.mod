@@ -1,6 +1,6 @@
 module github.com/kreuzwerker/m1-terraform-provider-helper
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/go-git/go-git/v5 v5.19.2
@@ -9,7 +9,7 @@ require (
 	github.com/jarcoal/httpmock v1.4.2
 	github.com/spf13/cobra v1.10.2
 	github.com/zclconf/go-cty v1.19.0
-	golang.org/x/mod v0.40.0
+	golang.org/x/mod v0.41.0
 )
 
 require (
