@@ -26,5 +26,5 @@ jobs:
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v7
         with:
-          version: 2.15.4
+          version: v2.18.2
           args: release --clean --skip=publish,sign --snapshot --verbose
