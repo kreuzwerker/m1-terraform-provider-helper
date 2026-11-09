@@ -2,6 +2,7 @@ package app
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -46,7 +47,7 @@ func (a *App) UpgradeLockfile(inputLockfilePath string, outputLockfilePath strin
 	config := parseHclLockfile(verifiedLockfilePath)
 
 	for i, v := range config.Provider {
-		filePath := a.Config.TerraformPluginDir + "/" + v.Name + "/" + v.Version + "/darwin_arm64"
+		filePath := providerInstallDir(a.Config.TerraformPluginDir, v.Name, v.Version)
 
 		// if filePath is existent that means we have an local installed provider
 		if isDirExistent(filePath) {
@@ -61,9 +62,15 @@ func (a *App) UpgradeLockfile(inputLockfilePath string, outputLockfilePath strin
 	writeFile(newContents, verifiedOutputPath)
 }
 
-func parseHclLockfile(filepath string) Lockfile {
+func decodeHclLockfile(filepath string) (Lockfile, error) {
 	var config Lockfile
 	err := hclsimple.DecodeFile(filepath, nil, &config)
+
+	return config, err
+}
+
+func parseHclLockfile(filepath string) Lockfile {
+	config, err := decodeHclLockfile(filepath)
 
 	if err != nil {
 		log.Fatalf("Failed to load configuration: %s", err)
@@ -178,6 +185,81 @@ func encodeHashSetTokens(hashes []string) hclwrite.Tokens {
 	})
 
 	return ret
+}
+
+func providerInstallDir(terraformPluginDir, providerAddress, version string) string {
+	return terraformPluginDir + "/" + providerAddress + "/" + version + "/darwin_arm64"
+}
+
+type lockfileProviderStatus int
+
+const (
+	lockfileProviderOK lockfileProviderStatus = iota
+	lockfileProviderMissingEntry
+	lockfileProviderMissingHash
+)
+
+func lockfileProviderStatusForLocalInstall(config Lockfile, providerAddress, version, localHash string) lockfileProviderStatus {
+	for _, p := range config.Provider {
+		if p.Name != providerAddress || p.Version != version {
+			continue
+		}
+
+		for _, h := range p.Hashes {
+			if h == localHash {
+				return lockfileProviderOK
+			}
+		}
+
+		return lockfileProviderMissingHash
+	}
+
+	return lockfileProviderMissingEntry
+}
+
+const lockfileMissingChecksumHintTemplate = "Hint: %s does not include a checksum for the locally installed provider %s %s. " +
+	"Run `m1-terraform-provider-helper lockfile upgrade` or `terraform init -upgrade` to update it.\n"
+
+const lockfileMissingProviderHintTemplate = "Hint: %s has no entry for locally installed provider %s %s. " +
+	"Run `terraform init -upgrade` (or `terraform init`) to add the provider version, then `m1-terraform-provider-helper lockfile upgrade` to record the local checksum.\n"
+
+func (a *App) printLockfileUpgradeHintIfNeeded(providerName, version string) {
+	lockfilePath := terraformLockfileName
+	if !isDirExistent(lockfilePath) {
+		return
+	}
+
+	normalizedVersion := version
+	if len(normalizedVersion) == 0 {
+		normalizedVersion = "master"
+	} else {
+		normalizedVersion = normalizeSemver(normalizedVersion)
+	}
+
+	registryHost := getProviderRegistryHost(a.Config.TerraformRegistryURL)
+	providerAddress := registryHost + "/" + providerName
+	providerDir := providerInstallDir(a.Config.TerraformPluginDir, providerAddress, normalizedVersion)
+
+	if !isDirExistent(providerDir) {
+		return
+	}
+
+	localHash := getCalculatedHashForProvider(providerDir)
+	config, err := decodeHclLockfile(lockfilePath)
+	if err != nil {
+		log.Printf("Skipping lockfile upgrade hint: could not read %s: %s", lockfilePath, err)
+
+		return
+	}
+
+	switch lockfileProviderStatusForLocalInstall(config, providerAddress, normalizedVersion, localHash) {
+	case lockfileProviderOK:
+		return
+	case lockfileProviderMissingHash:
+		fmt.Fprintf(a.Out, lockfileMissingChecksumHintTemplate, lockfilePath, providerName, normalizedVersion)
+	case lockfileProviderMissingEntry:
+		fmt.Fprintf(a.Out, lockfileMissingProviderHintTemplate, lockfilePath, providerName, normalizedVersion)
+	}
 }
 
 func getCalculatedHashForProvider(fullPath string) string {

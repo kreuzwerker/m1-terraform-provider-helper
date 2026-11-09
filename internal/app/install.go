@@ -379,6 +379,7 @@ func (a *App) Install(providerName string, version string, customBuildCommand st
 	name := extractRepoNameFromURL(gitRepo)
 	a.moveBinaryToCorrectLocation(providerName, version, name, buildOutput, buildDir)
 	fmt.Fprintf(a.Out, "Successfully installed %s %s\n", providerName, version)
+	a.printLockfileUpgradeHintIfNeeded(providerName, version)
 
 	return true
 }
