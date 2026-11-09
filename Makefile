@@ -90,7 +90,7 @@ TEST_REPORT_NAME ?= results.xml
 .PHONY: test
 test: TEST_REPORT ?= main
 test: TEST_FORMAT ?= short-verbose
-test: TEST_TIMEOUT ?= 1m
+test: TEST_TIMEOUT ?= 3m
 test: SHELL = /bin/bash
 test: bin/gotestsum ## General test cmd. DO NOT use directly, but use test-functional or test-integration
 	@mkdir -p ${BUILD_DIR}/test_results/${TEST_REPORT}

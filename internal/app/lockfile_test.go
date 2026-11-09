@@ -132,7 +132,7 @@ func TestGetLockfile(t *testing.T) {
 	})
 }
 
-func TestLockfileMissingProviderHash(t *testing.T) {
+func TestLockfileProviderStatusForLocalInstall(t *testing.T) {
 	config := Lockfile{
 		Provider: []ProviderConfig{
 			{
@@ -143,21 +143,21 @@ func TestLockfileMissingProviderHash(t *testing.T) {
 		},
 	}
 
-	t.Run("returns true when hash is missing", func(t *testing.T) {
-		if !lockfileMissingProviderHash(config, "registry.terraform.io/hashicorp/template", "2.1.1", "h1:local") {
-			t.Fatal("expected missing hash to require lockfile upgrade")
+	t.Run("returns missing hash when hash is absent", func(t *testing.T) {
+		if lockfileProviderStatusForLocalInstall(config, "registry.terraform.io/hashicorp/template", "2.1.1", "h1:local") != lockfileProviderMissingHash {
+			t.Fatal("expected missing hash status")
 		}
 	})
 
-	t.Run("returns false when hash is present", func(t *testing.T) {
-		if lockfileMissingProviderHash(config, "registry.terraform.io/hashicorp/template", "2.1.1", "h1:existing") {
+	t.Run("returns ok when hash is present", func(t *testing.T) {
+		if lockfileProviderStatusForLocalInstall(config, "registry.terraform.io/hashicorp/template", "2.1.1", "h1:existing") != lockfileProviderOK {
 			t.Fatal("expected existing hash to satisfy lockfile")
 		}
 	})
 
-	t.Run("returns true when provider is absent", func(t *testing.T) {
-		if !lockfileMissingProviderHash(config, "registry.terraform.io/hashicorp/aws", "5.0.0", "h1:local") {
-			t.Fatal("expected absent provider to require lockfile upgrade")
+	t.Run("returns missing entry when provider is absent", func(t *testing.T) {
+		if lockfileProviderStatusForLocalInstall(config, "registry.terraform.io/hashicorp/aws", "5.0.0", "h1:local") != lockfileProviderMissingEntry {
+			t.Fatal("expected absent provider status")
 		}
 	})
 }
@@ -217,8 +217,12 @@ provider "` + providerAddress + `" {
 
 	a.printLockfileUpgradeHintIfNeeded("hashicorp/template", version)
 
-	if !strings.Contains(output.String(), "lockfile upgrade") {
-		t.Fatalf("expected lockfile upgrade hint, got: %q", output.String())
+	hint := output.String()
+	if !strings.Contains(hint, "lockfile upgrade") {
+		t.Fatalf("expected lockfile upgrade hint, got: %q", hint)
+	}
+	if strings.Contains(hint, "terraform providers lock") {
+		t.Fatalf("did not expect terraform providers lock in hint, got: %q", hint)
 	}
 
 	lockfileContents = `# This file is maintained automatically by "terraform init".
@@ -240,6 +244,47 @@ provider "` + providerAddress + `" {
 
 	if output.Len() != 0 {
 		t.Fatalf("expected no hint when hash is present, got: %q", output.String())
+	}
+
+	lockfileContents = `not valid hcl for terraform lock file
+`
+	if err := os.WriteFile(terraformLockfileName, []byte(lockfileContents), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	output.Reset()
+	a.printLockfileUpgradeHintIfNeeded("hashicorp/template", version)
+
+	if output.Len() != 0 {
+		t.Fatalf("expected no hint on lockfile parse error, got: %q", output.String())
+	}
+
+	if err := os.Remove(terraformLockfileName); err != nil {
+		t.Fatal(err)
+	}
+
+	lockfileContents = `# This file is maintained automatically by "terraform init".
+
+provider "registry.terraform.io/hashicorp/aws" {
+  version = "5.0.0"
+  hashes = [
+    "h1:other",
+  ]
+}
+`
+	if err := os.WriteFile(terraformLockfileName, []byte(lockfileContents), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	output.Reset()
+	a.printLockfileUpgradeHintIfNeeded("hashicorp/template", version)
+
+	hint = output.String()
+	if !strings.Contains(hint, "has no entry for locally installed provider") {
+		t.Fatalf("expected missing provider entry hint, got: %q", hint)
+	}
+	if strings.Contains(hint, "does not include a checksum") {
+		t.Fatalf("expected provider-entry hint, not checksum hint, got: %q", hint)
 	}
 }
 
